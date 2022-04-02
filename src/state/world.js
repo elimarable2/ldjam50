@@ -20,7 +20,8 @@ World.prototype.step = function (elapsed) {
 
 };
 World.prototype.draw = function (ctx) {
-  
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
 };
 World.prototype.keydown = function (ev) {
   // this.console.keydown(ev);
