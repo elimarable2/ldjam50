@@ -83,11 +83,19 @@ Player.prototype.draw = function(ctx, camera) {
   this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
   
   ctx.fillStyle = "#ffffff";
+  ctx.strokeStyle = "#ffffff";
   // ctx.fillRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
   
   ctx.beginPath();
   ctx.arc(this.drawBounds.centerX, this.drawBounds.centerY, this.drawBounds.width / 2, 0, 2*Math.PI);
   ctx.fill();
+  
+  var closestX = Math.floor(this.bounds.centerX);
+  var closestY = Math.floor(this.bounds.centerY);
+  this.drawBounds.moveTo(closestX, closestY);
+  this.drawBounds.resize(1,1);
+  this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
+  ctx.strokeRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
   
   var i = 0;
   ctx.textAlign = 'left';
