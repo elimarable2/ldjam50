@@ -47,8 +47,12 @@ function World() {
   
   buffer_clamp(noiseMap, 0, 1);
   
+  buffer_apply(noiseMap, function (value) {
+    return value > 0.5 ? 1 : 0;
+  });
+  
   // this.spec = toColors(noiseMap);
-  this.spec = toColors(noiseMap, onOff);
+  this.spec = toColors(noiseMap);
   
   // this.spec = toColors(smoothNoise(this.baseNoise, 2));
   
