@@ -39,8 +39,6 @@ WorldCameraController.prototype.step = function (elapsed) {
         * (WorldCameraController.FAR_ACCELERATION - WorldCameraController.NEAR_ACCELERATION) + WorldCameraController.NEAR_ACCELERATION;
     }
     
-    console.log(m, acceleration, this.speed);
-    
     if (m < this.speed * this.speed / 2 / acceleration) {
       this.speed -= acceleration * elapsed;
     } else if (this.speed + acceleration * elapsed < WorldCameraController.MAX_SPEED) {
