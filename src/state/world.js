@@ -20,6 +20,7 @@ function World(spec, cost) {
   this.mold = [];
   this.totalCoins = 0;
   this.portalTimer = 0;
+  this.moldTimer = 0;
   
   this.layout = toColors(spec, function (value) {
     if (value === 0) return 'black';
@@ -75,6 +76,7 @@ function World(spec, cost) {
 World.MAJOR_AXIS_TILES = 30;
 World.TILE_SIZE = 96;
 World.PORTAL_TIME = 1500;
+World.MOLD_TIME = 3000;
 
 World.prototype.onEnter = function () {
   // MUSIC.stopAll();
@@ -93,12 +95,25 @@ World.prototype.step = function (elapsed) {
     }
   }
   
+  var touchingMold = false;
   for (var j = 0; j < this.mold.length; ++j) {
     for (var i = 0; i < this.mold[j].length; ++i) {
       if (this.mold[j][i] && this.mold[j][i]) {
         this.mold[j][i].update(elapsed, this);
+        if (!touchingMold && this.mold[j][i].bounds.intersect(this.player.bounds)) {
+          touchingMold = true;
+        }
       }
     }
+  }
+  if (touchingMold) {
+    this.moldTimer += elapsed;
+    if (this.moldTimer > World.MOLD_TIME) {
+      Game.setState(generateLevel(1));
+    }
+  } else {
+      this.moldTimer -= elapsed;
+      if (this.moldTimer < 0) this.moldTimer = 0;
   }
   
   if (this.totalCoins >= this.cost) {
