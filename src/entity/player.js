@@ -30,7 +30,11 @@ Player.prototype.draw = function(ctx, camera) {
   this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
   
   ctx.fillStyle = "#ffffff";
-  ctx.fillRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
+  // ctx.fillRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
+  
+  ctx.beginPath();
+  ctx.arc(this.drawBounds.centerX, this.drawBounds.centerY, this.drawBounds.width / 2, 0, 2*Math.PI);
+  ctx.fill();
   
   var i = 0;
   ctx.textAlign = 'left';
