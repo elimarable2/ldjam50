@@ -64,6 +64,14 @@ Rectangle.prototype.resize = function (width, height) {
   this.centerX = this.left + width / 2;
   this.centerY = this.top + height / 2;
 };
+Rectangle.prototype.resizeCentered = function (width, height) {
+  this.width = width;
+  this.height = height;
+  this.left = this.centerX - width / 2;
+  this.top = this.centerY - height / 2;
+  this.right = this.left + width;
+  this.bottom = this.top + height;
+};
 Rectangle.prototype.resizeBy = function (x, y) {
   if (y == null) y = x;
   this.width = x * this.width;
@@ -123,8 +131,13 @@ Rectangle.deserialize = function (data) {
 };
 
 function Circle(x,y,radius) {
-  Rectangle.call(this,x - radius, y - radius, radius * 2, radius * 2);
-  this.radius = radius;
+  if (x instanceof Circle) {
+    this.copyFrom(x);
+    this.radius = x.radius;
+  } else {
+    Rectangle.call(this,x - radius, y - radius, radius * 2, radius * 2);
+    this.radius = radius;
+  }
 }
 Circle.prototype = new Rectangle;
 Circle.prototype.resize = function (radius) {
