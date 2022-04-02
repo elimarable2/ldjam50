@@ -32,7 +32,7 @@ function World(spec) {
         while (index.length < 2) index = '0' + index;
         bctx.fillStyle = '#' + index + index + index;
       
-        bctx.fillRect(i*World.TILE_SIZE,j*World.TILE_SIZE,World.TILE_SIZE,World.TILE_SIZE);
+        bctx.fillRect(i*World.TILE_SIZE,j*World.TILE_SIZE,World.TILE_SIZE-2,World.TILE_SIZE-2);
       }
     }
   }
@@ -65,7 +65,7 @@ World.prototype.draw = function (ctx) {
   
   this.sourceBounds.copyFrom(this.camera.bounds);
   this.sourceBounds.moveBy(this.sourceBounds.left * World.TILE_SIZE, this.sourceBounds.top * World.TILE_SIZE);
-  this.sourceBounds.resizeBy(World.TILE_SIZE);
+  this.sourceBounds.resizeBy(World.TILE_SIZE - 1);
   this.destBounds = this.camera.screenRect(this.camera.bounds,this.destBounds);
   ctx.drawImage(this.backplane, 
     this.sourceBounds.left, this.sourceBounds.top, this.sourceBounds.width, this.sourceBounds.height,
@@ -79,6 +79,11 @@ World.prototype.draw = function (ctx) {
     for (var i = 0; i < this.width; ++i) {
       ctx.fillStyle = this.layout[j][i];
       ctx.fillRect(i * scale_spec, j * scale_spec, scale_spec, scale_spec);
+      
+      this.destBounds.moveTo(i,j);
+      this.destBounds.resize(1,1);
+      this.destBounds = this.camera.screenRect(this.destBounds,this.destBounds);
+      ctx.fillRect(this.destBounds.left, this.destBounds.top, 4,4);
     }
   }
   
@@ -122,15 +127,16 @@ World.prototype.mousemove = function (ev) {
 function generateWorld(width, height) {
   if (width == undefined) width = 100;
   if (height == undefined) height = width;
+  var minorAxis = Math.min(width, height);
   
   var noiseMap = valueNoise(whiteNoise(width,height), 4);
   
-  var glowMap = glow(width, height, 5, 20);
+  var glowMap = glow(width, height, 5, minorAxis / 5);
   buffer_apply(glowMap, function (value) {
     return value * 0.5;
   });
   
-  var outerEdgeMap = glow(width, height, 40, 50);
+  var outerEdgeMap = glow(width, height, 2 * minorAxis / 5, minorAxis / 2);
   buffer_invert(outerEdgeMap);
   
   buffer_add(noiseMap, glowMap);
@@ -142,7 +148,7 @@ function generateWorld(width, height) {
     return value >= 0.5 ? 1 : 0;
   });
   
-  noiseMap = cull(noiseMap,50,50);
+  noiseMap = cull(noiseMap,minorAxis / 2,minorAxis / 2);
   
   // Remove pillars
   buffer_apply(noiseMap, function (value, x, y) {

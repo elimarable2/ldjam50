@@ -214,7 +214,7 @@ function cull(input, startX, startY) {
       checked[cell] = true;
     }
   }
-  check(startX,startY);
+  check(Math.floor(startX),Math.floor(startY));
     
   while (next.length > 0) {
     var nextCell = next.shift();
