@@ -111,17 +111,24 @@ World.prototype.draw = function (ctx) {
     
   var ds = Math.max(2, scale_map);
     
-  ctx.fillStyle = 'blue';
+  ctx.fillStyle = '#0040ff';
+  var dl = 80;
+  var dr = 80;
+  ctx.fillRect(Math.floor(dl - ds/2), Math.floor(dr - ds/2), ds, ds);
+  
+  ctx.fillStyle = '#b000ff';
   for (var i = 0; i < this.coins.length; ++i) {
     var coin = this.coins[i];
-    var dl = coin.bounds.left * scale_map;
-    var dr = coin.bounds.top * scale_map;
-    ctx.fillRect(Math.floor(dl - ds/2), Math.floor(dr - ds/2), ds, ds);
+    if (coin.active) {
+      var dl = coin.bounds.centerX * scale_map;
+      var dr = coin.bounds.centerY * scale_map;
+      ctx.fillRect(Math.floor(dl - ds/2), Math.floor(dr - ds/2), ds, ds);
+    }
   }
   
   ctx.fillStyle = 'red';
-  var dl = this.player.bounds.left * scale_map;
-  var dr = this.player.bounds.top * scale_map;
+  var dl = this.player.bounds.centerX * scale_map;
+  var dr = this.player.bounds.centerY * scale_map;
   ctx.fillRect(Math.floor(dl - ds/2), Math.floor(dr - ds/2), ds, ds);
     
   this.player.draw(ctx, this.camera);
