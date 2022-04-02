@@ -1,11 +1,11 @@
 function Coin(x,y) {
-  this.bounds = new Circle(x + 0.5,y + 0.5,1);
+  this.bounds = new Circle(x + 0.5,y + 0.5,0.5);
   this.drawBounds = new Rectangle(this.bounds);
   
   this.active = true;
 }
 
-Coin.DRAW_RADIUS = 0.5;
+Coin.DRAW_RADIUS = 0.25;
 
 Coin.prototype.draw = function(ctx, camera) {
   this.drawBounds.copyFrom(this.bounds);
