@@ -74,7 +74,14 @@ World.prototype.draw = function (ctx) {
   // ctx.drawImage(this.backplane,0,0,Game.WIDTH,Game.HEIGHT);
     
   var scale_spec = 2;
-    
+  
+  for (var j = 0; j < this.height; ++j) {
+    for (var i = 0; i < this.width; ++i) {
+      ctx.fillStyle = this.layout[j][i];
+      ctx.fillRect(i * scale_spec, j * scale_spec, scale_spec, scale_spec);
+    }
+  }
+  
   ctx.strokeStyle = 'red';
   ctx.strokeRect(
     this.camera.bounds.left * scale_spec,
