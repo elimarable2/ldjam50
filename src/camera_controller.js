@@ -6,7 +6,7 @@ function WorldCameraController(world, camera) {
     y: camera.bounds.centerY
   };
   
-  this.maxSpeed = 0.1;
+  this.maxSpeed = 1;
   this.speed = 0;
   this.acceleration = 0.001;
 }

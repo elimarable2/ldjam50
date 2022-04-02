@@ -8,20 +8,73 @@ function Player(x,y) {
 		up: false,
 		down: false,
 	};
+  
+  this.targetVelocity = {
+    x:0,
+    y:0,
+  };
+  this.velocity = {
+    x:0,
+    y:0,
+  };
+  this.speed = 0;
 }
+
+Player.MAX_SPEED = 0.007;
+Player.ACCELERATION = Player.MAX_SPEED * 0.005;
+Player.ANGLE_CHANGE = Math.PI * 0.002;
+
 Player.prototype.update = function(elapsed, world) {
-  if (this.keys.left) {
-    this.bounds.moveBy(-0.003 * elapsed, 0);
+  this.targetVelocity.x = 0;
+  if (this.keys.left) this.targetVelocity.x -= 1;
+  if (this.keys.right) this.targetVelocity.x += 1;
+  
+  this.targetVelocity.y = 0;
+  if (this.keys.up) this.targetVelocity.y -= 1;
+  if (this.keys.down) this.targetVelocity.y += 1;
+  
+  var speedUp = true;
+  if (this.targetVelocity.x === 0 && this.targetVelocity.y === 0) {
+    speedUp = false;
+  } else {
+    var targetAngle = Math.atan2(this.targetVelocity.y, this.targetVelocity.x);
+    var currentAngle = targetAngle;
+    if (this.speed > 0) {
+      currentAngle = Math.atan2(this.velocity.y, this.velocity.x);
+    }
+    var angleDiff = targetAngle - currentAngle;
+    angleDiff += angleDiff > Math.PI ? -2*Math.PI : angleDiff < -Math.PI ? 2*Math.PI : 0;
+    
+    var nextAngle;
+    if (Math.abs(angleDiff) < Player.ANGLE_CHANGE * elapsed) {
+      nextAngle = targetAngle;
+    } else {
+      if (Math.abs(angleDiff) > Math.PI / 2) {
+        speedUp = false;
+      }
+      nextAngle = currentAngle + Math.sign(angleDiff) * Player.ANGLE_CHANGE * elapsed;
+    }
+    
+    this.velocity.x = Math.cos(nextAngle);
+    this.velocity.y = Math.sin(nextAngle);
   }
-  if (this.keys.right) {
-    this.bounds.moveBy(0.003 * elapsed, 0);
-  }
-  if (this.keys.up) {
-    this.bounds.moveBy(0, -0.003 * elapsed);
-  }
-  if (this.keys.down) {
-    this.bounds.moveBy(0, 0.003 * elapsed);
-  }
+  
+  var acceleration = Player.ACCELERATION * elapsed;
+  if (speedUp) {
+    if (this.speed + acceleration < Player.MAX_SPEED) {
+      this.speed += acceleration;
+    } else {
+      this.speed = Player.MAX_SPEED;
+    }
+  } else {
+    if (this.speed - acceleration > 0) {
+      this.speed -= acceleration;
+    } else {
+      this.speed = 0;
+    }
+  }  
+  
+  this.bounds.moveBy(this.velocity.x * this.speed * elapsed, this.velocity.y * this.speed * elapsed);
 };
 Player.prototype.animationUpdate = function (elapsed) {
 };
