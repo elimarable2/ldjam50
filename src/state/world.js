@@ -100,7 +100,7 @@ World.prototype.step = function (elapsed) {
     for (var i = 0; i < this.mold[j].length; ++i) {
       if (this.mold[j][i] && this.mold[j][i]) {
         this.mold[j][i].update(elapsed, this);
-        if (!touchingMold && this.mold[j][i].bounds.intersect(this.player.bounds)) {
+        if (!touchingMold && this.player.bounds.intersect(this.mold[j][i].bounds)) {
           touchingMold = true;
         }
       }

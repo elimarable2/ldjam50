@@ -159,6 +159,8 @@ Circle.prototype.intersect = function (other) {
   if (other instanceof Rectangle) {
     var radiusSquared = this.radius * this.radius;
     var dx, dy;
+    // INSIDE
+    if (other.contains(this.centerX, this.centerY)) return true;
     // LEFT EDGE
     dx = other.left - this.centerX;
     dy = Math.min(Math.max(this.centerY, other.top), other.bottom) - this.centerY;
