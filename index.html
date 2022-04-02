@@ -1,0 +1,44 @@
+<html>
+<head>
+	<title>LDJam 50</title>
+	<script src="src/loader.js"></script>
+	<script src="src/util/font.js"></script>
+	<script src="src/util/animation.js"></script>
+	<script src="src/util/audio.js"></script>
+	<script src="src/util/brush_default.js"></script>
+	<script src="src/util/brush_area.js"></script>
+	<script src="src/ui.js"></script>
+  <script src="src/console.js"></script>
+	<script src="src/vector.js"></script>
+	<script src="src/geometry.js"></script>
+	<script src="src/physics.js"></script>
+	<script src="src/particle.js"></script>
+	<script src="src/camera.js"></script>
+	<script src="src/camera_controller.js"></script>
+	<script src="src/index.js"></script>
+	
+	<style>
+	body {
+		text-align: center;
+		background-color: #100a05;
+    margin: 0;
+    padding: 0;
+	}
+  #main_box {
+    width: 100%;
+    height: 100%;
+  }
+  #main_canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    box-shadow: 0 0 10px 8px rgba(0, 0, 0, 0.33);
+  }
+	</style>
+</head>
+<body>
+  <div id="main_box">
+    <canvas id="main_canvas" width="640" height="480"></canvas>
+  </div>
+</body>
+</html>
