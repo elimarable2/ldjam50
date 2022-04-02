@@ -15,6 +15,9 @@ function World(spec, cost) {
   this.cameraControl = new WorldCameraController(this, this.camera);
   this.cameraControl.jumpToTarget();
   
+  this.coins = [];
+  this.totalCoins = 0;
+  
   this.layout = toColors(spec, function (value) {
     if (value === 0) return 'black';
     return 'white';
@@ -46,6 +49,9 @@ function World(spec, cost) {
         mctx.fillStyle = this.layout[j][i];
         mctx.fillRect(i, j, 1, 1);
       }
+      if (this.spec[j][i] === 2) {
+        this.coins.push(new Coin(i,j));
+      }
     }
   }
   
@@ -69,6 +75,15 @@ World.prototype.onEnter = function () {
 World.prototype.step = function (elapsed) {
   this.player.update(elapsed, this);
   this.cameraControl.step(elapsed);
+  
+  for (var i = 0; i < this.coins.length; ++i) {
+    if (this.coins[i].active) {
+      if (this.coins[i].bounds.intersect(this.player.bounds)) {
+        this.coins[i].active = false;
+        ++this.totalCoins;
+      }
+    }
+  }
 };
 World.prototype.draw = function (ctx) {
   ctx.fillStyle = '#000000';
@@ -94,13 +109,28 @@ World.prototype.draw = function (ctx) {
     this.camera.bounds.width * scale_map,
     this.camera.bounds.height * scale_map);
     
+  var ds = Math.max(2, scale_map);
+    
+  ctx.fillStyle = 'blue';
+  for (var i = 0; i < this.coins.length; ++i) {
+    var coin = this.coins[i];
+    var dl = coin.bounds.left * scale_map;
+    var dr = coin.bounds.top * scale_map;
+    ctx.fillRect(Math.floor(dl - ds/2), Math.floor(dr - ds/2), ds, ds);
+  }
+  
   ctx.fillStyle = 'red';
   var dl = this.player.bounds.left * scale_map;
   var dr = this.player.bounds.top * scale_map;
-  var ds = Math.max(2, scale_map);
   ctx.fillRect(Math.floor(dl - ds/2), Math.floor(dr - ds/2), ds, ds);
     
   this.player.draw(ctx, this.camera);
+  
+  for (var i = 0; i < this.coins.length; ++i) {
+    if (this.coins[i].active) {
+      this.coins[i].draw(ctx, this.camera);
+    }
+  }
   
   // if (this.index) {
     // ctx.textAlign = 'left';

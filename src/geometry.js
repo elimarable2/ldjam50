@@ -152,8 +152,8 @@ Circle.prototype.resize = function (radius) {
 Circle.prototype.intersect = function (other) {
   if (other instanceof Circle) {
     var totalRadius = this.radius + other.radius;
-    var dx = other.x - this.x;
-    var dy = other.y - this.y;
+    var dx = other.centerX - this.centerX;
+    var dy = other.centerY - this.centerY;
     return dx*dx + dy*dy <= totalRadius * totalRadius;
   }
   if (other instanceof Rectangle) {
