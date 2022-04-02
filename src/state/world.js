@@ -32,7 +32,7 @@ function World(spec) {
         while (index.length < 2) index = '0' + index;
         bctx.fillStyle = '#' + index + index + index;
       
-        bctx.fillRect(i*World.TILE_SIZE,j*World.TILE_SIZE,World.TILE_SIZE-2,World.TILE_SIZE-2);
+        bctx.fillRect(i*World.TILE_SIZE,j*World.TILE_SIZE,World.TILE_SIZE,World.TILE_SIZE);
       }
     }
   }
@@ -74,19 +74,7 @@ World.prototype.draw = function (ctx) {
   // ctx.drawImage(this.backplane,0,0,Game.WIDTH,Game.HEIGHT);
     
   var scale_spec = 2;
-  
-  for (var j = 0; j < this.height; ++j) {
-    for (var i = 0; i < this.width; ++i) {
-      ctx.fillStyle = this.layout[j][i];
-      ctx.fillRect(i * scale_spec, j * scale_spec, scale_spec, scale_spec);
-      
-      this.destBounds.moveTo(i,j);
-      this.destBounds.resize(1,1);
-      this.destBounds = this.camera.screenRect(this.destBounds,this.destBounds);
-      ctx.fillRect(this.destBounds.left, this.destBounds.top, 4,4);
-    }
-  }
-  
+    
   ctx.strokeStyle = 'red';
   ctx.strokeRect(
     this.camera.bounds.left * scale_spec,
@@ -130,10 +118,6 @@ function generateWorld(width, height) {
   var minorAxis = Math.min(width, height);
   
   var noiseMap = valueNoise(whiteNoise(width,height), 4);
-  
-  buffer_apply(noiseMap, function () { return 1; });
-  
-  return new World(noiseMap);
   
   var glowMap = glow(width, height, 5, minorAxis / 5);
   buffer_apply(glowMap, function (value) {
