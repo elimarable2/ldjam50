@@ -10,13 +10,15 @@ function World(spec, cost) {
   this.spec = spec;
   this.cost = cost;
   
-  this.player = new Player(this.width / 2,this.width / 2);
+  this.portal = new Portal(this.width / 2,this.height / 2);
+  this.player = new Player(this.portal.bounds.left,this.portal.bounds.bottom);
 	this.camera = new Camera(World.MAJOR_AXIS_TILES,World.MAJOR_AXIS_TILES * 9 / 16);
   this.cameraControl = new WorldCameraController(this, this.camera);
   this.cameraControl.jumpToTarget();
   
   this.coins = [];
   this.totalCoins = 0;
+  this.portalTimer = 0;
   
   this.layout = toColors(spec, function (value) {
     if (value === 0) return 'black';
@@ -67,6 +69,7 @@ function World(spec, cost) {
 
 World.MAJOR_AXIS_TILES = 30;
 World.TILE_SIZE = 96;
+World.PORTAL_TIME = 1500;
 
 World.prototype.onEnter = function () {
   // MUSIC.stopAll();
@@ -84,6 +87,20 @@ World.prototype.step = function (elapsed) {
       }
     }
   }
+  
+  if (this.totalCoins >= this.cost) {
+    if (this.portal.bounds.intersect(this.player.bounds)) {
+      this.portalTimer += elapsed;
+      if (this.portalTimer > World.PORTAL_TIME) {
+        var nextState = generateLevel(this.index +1);
+        nextState.totalCoins = this.totalCoins - this.cost;
+        Game.setState(nextState);
+      }
+    } else {
+      this.portalTimer -= elapsed;
+      if (this.portalTimer < 0) this.portalTimer = 0;
+    }
+  }
 };
 World.prototype.draw = function (ctx) {
   ctx.fillStyle = '#000000';
@@ -99,6 +116,61 @@ World.prototype.draw = function (ctx) {
   
   // ctx.drawImage(this.backplane,0,0,Game.WIDTH,Game.HEIGHT);
     
+  this.portal.draw(ctx, this.camera, this.totalCoins >= this.cost);
+  this.player.draw(ctx, this.camera);
+  
+  var coinsLeft = 0;
+  for (var i = 0; i < this.coins.length; ++i) {
+    if (this.coins[i].active) {
+      this.coins[i].draw(ctx, this.camera);
+      ++coinsLeft;
+    }
+  }
+  
+  this.drawMinimap(ctx);
+  
+  if (this.totalCoins < this.cost) {
+    ctx.globalAlpha = 0.5;
+  } else {
+    ctx.globalAlpha = 1;
+  }
+  ctx.fillStyle = "#b000ff";  
+  ctx.beginPath();
+  ctx.arc(Game.WIDTH - 20, 20, 10, 0, 2*Math.PI);
+  ctx.fill();
+  
+  ctx.globalAlpha = 1;
+  
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 20px monospace';
+  ctx.lineWidth = 1;
+
+  if (this.totalCoins < this.cost) {
+    ctx.strokeStyle = "#202020";  
+    ctx.fillStyle = "#606060";  
+  } else if (coinsLeft > 0) {
+    ctx.strokeStyle = "#606060";  
+    ctx.fillStyle = "#ffffff";  
+  } else { 
+    ctx.strokeStyle = "#605000";  
+    ctx.fillStyle = "#fff000"; 
+  }
+  ctx.fillText(' / ' + this.cost, Game.WIDTH - 40, 20);
+  ctx.strokeText(' / ' + this.cost, Game.WIDTH - 40, 20);
+  var costMetrics = ctx.measureText(' / ' + this.cost);  
+  
+  ctx.fillText(this.totalCoins, Game.WIDTH - 40 - costMetrics.width, 20);
+  ctx.strokeText(this.totalCoins, Game.WIDTH - 40 - costMetrics.width, 20);
+  
+  // if (this.index) {
+    // ctx.textAlign = 'left';
+    // ctx.textBaseline = 'top';
+    // ctx.fillText(this.index, 0, 0);
+  // }
+  
+};
+World.prototype.drawMinimap = function (ctx) {
   var scale_map = 160 / this.minimap.width;  
   ctx.drawImage(this.minimap, 0, 0, this.minimap.width * scale_map, this.minimap.height * scale_map);
   
@@ -130,21 +202,6 @@ World.prototype.draw = function (ctx) {
   var dl = this.player.bounds.centerX * scale_map;
   var dr = this.player.bounds.centerY * scale_map;
   ctx.fillRect(Math.floor(dl - ds/2), Math.floor(dr - ds/2), ds, ds);
-    
-  this.player.draw(ctx, this.camera);
-  
-  for (var i = 0; i < this.coins.length; ++i) {
-    if (this.coins[i].active) {
-      this.coins[i].draw(ctx, this.camera);
-    }
-  }
-  
-  // if (this.index) {
-    // ctx.textAlign = 'left';
-    // ctx.textBaseline = 'top';
-    // ctx.fillText(this.index, 0, 0);
-  // }
-  
 };
 World.prototype.keydown = function (ev) {
   // this.console.keydown(ev);
@@ -243,16 +300,16 @@ function generateWorld(width, height, coins, cost) {
 }
 
 function generateLevel(levelIndex) {
-  if (levelIndex > 10) levelIndex = 10;
+  var generationIndex = Math.min(levelIndex, 10);
   var COST_SCALE = 1.5;
   var BONUS_COINS = 4;
   var COIN_DECAY = 5.5;
   var BASE_SIZE = 7.5;
   var COIN_SIZE_FACTOR = 15;
   
-  var levelCost = Math.floor(Math.pow(COST_SCALE,levelIndex));
-  var coinModifier = BONUS_COINS * Math.pow(Math.E, -levelIndex / COIN_DECAY) + 1;
-  var levelCoins = levelCost * coinModifier;
+  var levelCost = Math.floor(Math.pow(COST_SCALE,generationIndex));
+  var coinModifier = BONUS_COINS * Math.pow(Math.E, -generationIndex / COIN_DECAY) + 1;
+  var levelCoins = Math.floor(levelCost * coinModifier);
   
   var levelSize = Math.floor(BASE_SIZE + COIN_SIZE_FACTOR * Math.sqrt(levelCoins));
   
