@@ -181,7 +181,7 @@ function buffer_apply(buffer, fn) {
   
   for (var j = 0; j < height; ++j) {
     for (var i = 0; i < width; ++i) {
-      buffer[j][i] = fn(buffer[j][i]);
+      buffer[j][i] = fn(buffer[j][i], i, j);
     }
   }
   

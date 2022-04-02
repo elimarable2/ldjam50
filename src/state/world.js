@@ -53,6 +53,25 @@ function World() {
   
   noiseMap = cull(noiseMap,50,50);
   
+  // Remove pillars
+  var width = this.width;
+  var height = this.height;
+  buffer_apply(noiseMap, function (value, x, y) {
+    if (x > 0
+      && y > 0
+      && x < width
+      && y < height
+      && value === 0) {
+      if (noiseMap[y][x - 1] === 1
+        && noiseMap[y - 1][x] === 1
+        && noiseMap[y][x + 1] === 1
+        && noiseMap[y + 1][x] === 1) {
+        return 1;
+      }
+    }
+    return value;
+  });
+  
   // this.spec = toColors(noiseMap);
   this.spec = toColors(noiseMap);
   
