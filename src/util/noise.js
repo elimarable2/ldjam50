@@ -141,15 +141,11 @@ function buffer_add(dest, src) {
   var height = dest.length;
   var width = dest[0].length;
   
-  console.log(dest[0][0], src[0][0]);
-  
   for (var j = 0; j < height; ++j) {
     for (var i = 0; i < width; ++i) {
       dest[j][i] += src[j][i];
     }
   }
-  
-  console.log(dest[0][0], src[0][0]);
     
   return dest;
 }
@@ -186,6 +182,52 @@ function buffer_apply(buffer, fn) {
   for (var j = 0; j < height; ++j) {
     for (var i = 0; i < width; ++i) {
       buffer[j][i] = fn(buffer[j][i]);
+    }
+  }
+  
+  return buffer;
+}
+
+function cull(input, startX, startY) {
+  var height = input.length;
+  var width = input[0].length;
+  
+  var buffer = [];
+  for (var j = 0; j < height; ++j) {
+    buffer[j] = [];
+    for (var i = 0; i < width; ++i) {
+      buffer[j][i] = 0;
+    }
+  }
+  
+  var next = [];
+  var checked = {};
+  
+  function check(x,y) {
+    if (x < 0) return;
+    if (y < 0) return;
+    if (x >= width) return;
+    if (y >= height) return;
+    var cell = y*width + x;
+    if (!checked[cell]) {
+      next.push(cell);
+      checked[cell] = true;
+    }
+  }
+  check(startX,startY);
+    
+  while (next.length > 0) {
+    var nextCell = next.shift();
+    var nextX = nextCell % width;
+    var nextY = Math.floor(nextCell / width);
+    
+    if (input[nextY][nextX] === 1) {
+      buffer[nextY][nextX] = 1;
+      
+      check(nextX - 1,nextY);
+      check(nextX,nextY - 1);
+      check(nextX + 1,nextY);
+      check(nextX,nextY + 1);
     }
   }
   

@@ -48,8 +48,10 @@ function World() {
   buffer_clamp(noiseMap, 0, 1);
   
   buffer_apply(noiseMap, function (value) {
-    return value > 0.5 ? 1 : 0;
+    return value >= 0.5 ? 1 : 0;
   });
+  
+  noiseMap = cull(noiseMap,50,50);
   
   // this.spec = toColors(noiseMap);
   this.spec = toColors(noiseMap);
