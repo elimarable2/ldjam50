@@ -26,10 +26,21 @@ function World() {
   this.height = 100;
   this.baseNoise = whiteNoise(this.width,this.height);
   
-  this.spec = toColors(valueNoise(this.baseNoise, 4), function (noiseValue) {
+  function onOff(noiseValue) {
     var on = noiseValue > 0.5;
     return on ? 'white' : 'black';
-  });
+  }
+  
+  // this.spec = toColors(valueNoise(this.baseNoise, 4), onOff);
+  
+  var noiseMap = valueNoise(this.baseNoise, 4);
+  var glowMap = glow(this.width, this.height, 5, 10);
+  
+  buffer_add(noiseMap, glowMap);
+  buffer_clamp(noiseMap, 0, 1);
+  
+  this.spec = toColors(noiseMap);
+  // this.spec = toColors(noiseMap, onOff);
   
   // this.spec = toColors(smoothNoise(this.baseNoise, 2));
   
@@ -71,10 +82,10 @@ World.prototype.mousedown = function (ev) {
     this.mouse.pressed = true;
   // } 
   
-  ++this.blend;
-  if (this.blend >= this.interpolation.length) this.blend = 0;
+  // ++this.blend;
+  // if (this.blend >= this.interpolation.length) this.blend = 0;
   
-  this.spec = toColors(valueNoise(this.baseNoise, 4, 0.5, this.interpolation[this.blend]));
+  // this.spec = toColors(valueNoise(this.baseNoise, 4, 0.5, this.interpolation[this.blend]));
   
 };
 World.prototype.mouseup = function () {

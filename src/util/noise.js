@@ -6,7 +6,7 @@ function toColors(noiseBuffer, colorizer) {
   
   if (!colorizer) {
     colorizer = function (noiseValue) {
-      var node = Math.floor(noiseValue * 256);
+      var node = Math.floor(noiseValue * 255);
       var index = node.toString(16);
       while (index.length < 2) index = '0' + index;
       return '#' + index + index + index;
@@ -107,6 +107,73 @@ function valueNoise(noiseBuffer, octaves, persistance, interpolate) {
   for (var j = 0; j < height; ++j) {
     for (var i = 0; i < width; ++i) {
       buffer[j][i] /= totalAmplitude;
+    }
+  }
+  
+  return buffer;
+}
+
+function glow(width, height, inner_radius, outer_radius) {
+  var v_center = height / 2;
+  var h_center = width / 2;
+  
+  var buffer = [];
+  
+  for (var j = 0; j < height; ++j) {
+    buffer[j] = [];
+    for (var i = 0; i < width; ++i) {
+      var d = Math.sqrt(Math.pow(i - h_center, 2) + Math.pow(j - v_center, 2));
+      
+      if (d < inner_radius) {
+        buffer[j][i] = 1;
+      } else if (d > outer_radius) {
+        buffer[j][i] = 0;
+      } else {
+        buffer[j][i] = (outer_radius - d) / (outer_radius - inner_radius);
+      }
+    }
+  }
+  
+  return buffer;
+}
+
+function buffer_add(dest, src) {
+  var height = dest.length;
+  var width = dest[0].length;
+  
+  console.log(dest[0][0], src[0][0]);
+  
+  for (var j = 0; j < height; ++j) {
+    for (var i = 0; i < width; ++i) {
+      dest[j][i] += src[j][i];
+    }
+  }
+  
+  console.log(dest[0][0], src[0][0]);
+    
+  return dest;
+}
+
+function buffer_subtract(dest, src) {
+  var height = dest.length;
+  var width = dest[0].length;
+  
+  for (var j = 0; j < height; ++j) {
+    for (var i = 0; i < width; ++i) {
+      dest[j][i] -= src[j][i];
+    }
+  }
+  
+  return dest;
+}
+
+function buffer_clamp(buffer, min, max) {
+  var height = buffer.length;
+  var width = buffer[0].length;
+  
+  for (var j = 0; j < height; ++j) {
+    for (var i = 0; i < width; ++i) {
+      buffer[j][i] = Math.min(1, Math.max(0, buffer[j][i]));
     }
   }
   
