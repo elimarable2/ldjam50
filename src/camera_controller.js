@@ -9,9 +9,10 @@ function WorldCameraController(world, camera) {
   this.speed = 0;
 }
 
-WorldCameraController.DISTANCE_LIMIT = 3;
+WorldCameraController.NEAR_DISTANCE = 3;
 WorldCameraController.NEAR_ACCELERATION = 0.0001;
-WorldCameraController.FAR_ACCELERATION = 0.001;
+WorldCameraController.FAR_DISTANCE = 10;
+WorldCameraController.FAR_ACCELERATION = 0.002;
 WorldCameraController.MAX_SPEED = 1;
 
 WorldCameraController.prototype.getTarget = function () {
@@ -30,9 +31,12 @@ WorldCameraController.prototype.step = function (elapsed) {
     this.camera.moveCenterTo(this.target.x, this.target.y);
     this.speed = 0;
   } else {
-    var acceleration = WorldCameraController.FAR_ACCELERATION;
-    if (m < WorldCameraController.DISTANCE_LIMIT) {
-      acceleration = WorldCameraController.NEAR_ACCELERATION;
+    var acceleration = WorldCameraController.NEAR_ACCELERATION;
+    if (m > WorldCameraController.FAR_DISTANCE) {
+      acceleration = WorldCameraController.FAR_ACCELERATION;
+    } else if (m > WorldCameraController.NEAR_DISTANCE) {
+      acceleration = (m - WorldCameraController.NEAR_DISTANCE) / (WorldCameraController.FAR_DISTANCE - WorldCameraController.NEAR_DISTANCE)
+        * (WorldCameraController.FAR_ACCELERATION - WorldCameraController.NEAR_ACCELERATION) + WorldCameraController.NEAR_ACCELERATION;
     }
     
     console.log(m, acceleration, this.speed);
