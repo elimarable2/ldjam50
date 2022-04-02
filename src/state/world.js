@@ -64,8 +64,8 @@ World.prototype.draw = function (ctx) {
   ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
   
   this.sourceBounds.copyFrom(this.camera.bounds);
-  this.sourceBounds.moveBy(this.sourceBounds.left * World.TILE_SIZE, this.sourceBounds.top * World.TILE_SIZE);
-  this.sourceBounds.resizeBy(World.TILE_SIZE - 1);
+  this.sourceBounds.moveTo(this.sourceBounds.left * World.TILE_SIZE, this.sourceBounds.top * World.TILE_SIZE);
+  this.sourceBounds.resizeBy(World.TILE_SIZE);
   this.destBounds = this.camera.screenRect(this.camera.bounds,this.destBounds);
   ctx.drawImage(this.backplane, 
     this.sourceBounds.left, this.sourceBounds.top, this.sourceBounds.width, this.sourceBounds.height,
@@ -130,6 +130,10 @@ function generateWorld(width, height) {
   var minorAxis = Math.min(width, height);
   
   var noiseMap = valueNoise(whiteNoise(width,height), 4);
+  
+  buffer_apply(noiseMap, function () { return 1; });
+  
+  return new World(noiseMap);
   
   var glowMap = glow(width, height, 5, minorAxis / 5);
   buffer_apply(glowMap, function (value) {
