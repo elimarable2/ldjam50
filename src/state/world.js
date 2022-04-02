@@ -10,7 +10,7 @@ function World(spec) {
   this.spec = spec;
   
   this.player = new Player(this.width / 2,this.width / 2);
-	this.camera = new Camera(20,20 * 9 / 16);
+	this.camera = new Camera(World.MAJOR_AXIS_TILES,World.MAJOR_AXIS_TILES * 9 / 16);
   this.cameraControl = new WorldCameraController(this, this.camera);
   this.cameraControl.jumpToTarget();
   
@@ -48,6 +48,7 @@ function World(spec) {
   this.destBounds = new Rectangle();
 }
 
+World.MAJOR_AXIS_TILES = 30;
 World.TILE_SIZE = 96;
 
 World.prototype.onEnter = function () {
