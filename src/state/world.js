@@ -39,8 +39,9 @@ function World(spec, cost) {
   bctx.fillStyle = '#000000';
   bctx.fillRect(0,0,this.backplane.width,this.backplane.height);
   
-  for (var i = 0; i < this.width; ++i) {
-    for (var j = 0; j < this.height; ++j) {
+  for (var j = 0; j < this.height; ++j) {
+    this.mold[j] = [];
+    for (var i = 0; i < this.width; ++i) {
       if (this.spec[j][i] !== 0) {
         var node = Math.floor(Math.random() * 32+32);
         var index = node.toString(16);
@@ -56,7 +57,7 @@ function World(spec, cost) {
         this.coins.push(new Coin(i,j));
       }
       if (this.spec[j][i] === 3) {
-        this.mold.push(new Mold(i,j));
+        this.mold[j][i] = new Mold(i,j);
       }
     }
   }
@@ -92,6 +93,14 @@ World.prototype.step = function (elapsed) {
     }
   }
   
+  for (var j = 0; j < this.mold.length; ++j) {
+    for (var i = 0; i < this.mold[j].length; ++i) {
+      if (this.mold[j][i] && this.mold[j][i]) {
+        this.mold[j][i].update(elapsed, this);
+      }
+    }
+  }
+  
   if (this.totalCoins >= this.cost) {
     if (this.portal.bounds.intersect(this.player.bounds)) {
       this.portalTimer += elapsed;
@@ -118,6 +127,12 @@ World.prototype.draw = function (ctx) {
     this.sourceBounds.left, this.sourceBounds.top, this.sourceBounds.width, this.sourceBounds.height,
     this.destBounds.left, this.destBounds.top, this.destBounds.width, this.destBounds.height);
   
+  for (var j = 0; j < this.mold.length; ++j) {
+    for (var i = 0; i < this.mold[j].length; ++i) {
+      if (this.mold[j][i]) this.mold[j][i].draw(ctx, this.camera);
+    }
+  }
+  
   // ctx.drawImage(this.backplane,0,0,Game.WIDTH,Game.HEIGHT);
     
   this.portal.draw(ctx, this.camera, this.totalCoins >= this.cost);
@@ -129,10 +144,6 @@ World.prototype.draw = function (ctx) {
       this.coins[i].draw(ctx, this.camera);
       ++coinsLeft;
     }
-  }
-  
-  for (var i = 0; i < this.mold.length; ++i) {
-    this.mold[i].draw(ctx, this.camera);
   }
   
   ctx.lineWidth = 1;
@@ -334,11 +345,11 @@ function generateWorld(width, height, coins, cost) {
 
 function generateLevel(levelIndex) {
   var generationIndex = Math.min(levelIndex, 10);
-  var COST_SCALE = 1.5;
-  var BONUS_COINS = 4;
-  var COIN_DECAY = 5.5;
-  var BASE_SIZE = 7.5;
-  var COIN_SIZE_FACTOR = 15;
+  var COST_SCALE = 1.6;
+  var BONUS_COINS = 2;
+  var COIN_DECAY = 7.5;
+  var BASE_SIZE = 10;
+  var COIN_SIZE_FACTOR = 11;
   
   var levelCost = Math.floor(Math.pow(COST_SCALE,generationIndex));
   var coinModifier = BONUS_COINS * Math.pow(Math.E, -generationIndex / COIN_DECAY) + 1;
