@@ -18,6 +18,8 @@ function Player(x,y) {
     y:0,
   };
   this.speed = 0;
+  
+  this.nearby = [];
 }
 
 Player.MAX_SPEED = 0.007;
@@ -75,6 +77,20 @@ Player.prototype.update = function(elapsed, world) {
   }  
   
   this.bounds.moveBy(this.velocity.x * this.speed * elapsed, this.velocity.y * this.speed * elapsed);
+  
+  var closestX = Math.floor(this.bounds.centerX);
+  var closestY = Math.floor(this.bounds.centerY);
+  
+  for (var i = 0; i <= 2; ++i) {
+    for (var j = 0; j <= 2; ++j) {
+      var globalX = closestX - 1 + i;
+      var globalY = closestY - 1 + j;
+      
+      this.nearby[j*3+i] = world.spec[globalY][globalX] === 0;
+    }
+  }
+  
+  this.animationUpdate(elapsed);
 };
 Player.prototype.animationUpdate = function (elapsed) {
 };
@@ -96,6 +112,19 @@ Player.prototype.draw = function(ctx, camera) {
   this.drawBounds.resize(1,1);
   this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
   ctx.strokeRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
+  
+  ctx.strokeStyle = "#ff0000";
+  for (var i = 0; i < this.nearby.length; ++i) {
+    if (this.nearby[i]) {
+      var offsetX = (i % 3) - 1;
+      var offsetY = Math.floor(i / 3) - 1;
+      
+      this.drawBounds.moveTo(closestX + offsetX, closestY + offsetY);
+      this.drawBounds.resize(1,1);
+      this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
+      ctx.strokeRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
+    }
+  }
   
   var i = 0;
   ctx.textAlign = 'left';
