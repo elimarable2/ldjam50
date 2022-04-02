@@ -1,5 +1,5 @@
-function Camera() {
-  this.aspectRatio = [16,9];
+function Camera(width, height) {
+  this.aspectRatio = [width,height];
   this.bounds = new Rectangle(0,0,this.aspectRatio[0],this.aspectRatio[1]);
 }
 Camera.prototype.moveBy = function () {
@@ -53,11 +53,13 @@ Camera.prototype.worldRect = function (screenRect, out) {
   return out;
 };
 Camera.prototype.screenRect = function (worldRect, out) {
-  var scale = this.getScale();
+  var viewport = this.getViewport();
+  var hScale = viewport.width / this.bounds.width;
+  var vScale = viewport.height / this.bounds.height;
   if (!out) out = new Rectangle(worldRect);
-  out.left = (worldRect.left - this.bounds.left) * scale;
-  out.top = (worldRect.top - this.bounds.top) * scale;
-  out.resize(worldRect.width * scale, worldRect.height * scale);
+  out.left = (worldRect.left - this.bounds.left) * hScale;
+  out.top = (worldRect.top - this.bounds.top) * vScale;
+  out.resize(worldRect.width * hScale, worldRect.height * vScale);
   return out;
 };
 Camera.prototype.getViewport = function () {
