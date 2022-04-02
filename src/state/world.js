@@ -34,13 +34,21 @@ function World() {
   // this.spec = toColors(valueNoise(this.baseNoise, 4), onOff);
   
   var noiseMap = valueNoise(this.baseNoise, 4);
-  var glowMap = glow(this.width, this.height, 5, 10);
+  var glowMap = glow(this.width, this.height, 5, 20);
+  buffer_apply(glowMap, function (value) {
+    return value * 0.5;
+  });
+  
+  var outerEdgeMap = glow(this.width, this.height, 40, 50);
+  buffer_invert(outerEdgeMap);
   
   buffer_add(noiseMap, glowMap);
+  buffer_subtract(noiseMap, outerEdgeMap);
+  
   buffer_clamp(noiseMap, 0, 1);
   
-  this.spec = toColors(noiseMap);
-  // this.spec = toColors(noiseMap, onOff);
+  // this.spec = toColors(noiseMap);
+  this.spec = toColors(noiseMap, onOff);
   
   // this.spec = toColors(smoothNoise(this.baseNoise, 2));
   

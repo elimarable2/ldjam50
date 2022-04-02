@@ -168,12 +168,24 @@ function buffer_subtract(dest, src) {
 }
 
 function buffer_clamp(buffer, min, max) {
+  return buffer_apply(buffer, function (value) {
+    return Math.min(1, Math.max(0, value));
+  });
+}
+
+function buffer_invert(buffer) {
+  return buffer_apply(buffer, function (value) {
+    return 1 - value;
+  });
+}
+
+function buffer_apply(buffer, fn) {
   var height = buffer.length;
   var width = buffer[0].length;
   
   for (var j = 0; j < height; ++j) {
     for (var i = 0; i < width; ++i) {
-      buffer[j][i] = Math.min(1, Math.max(0, buffer[j][i]));
+      buffer[j][i] = fn(buffer[j][i]);
     }
   }
   
