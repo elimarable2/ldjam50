@@ -94,7 +94,7 @@ Player.prototype.update = function(elapsed, world) {
       var globalY = closestY - 1 + j;
       
       var isWall = world.spec[globalY][globalX] === 0;
-      this.nearby[j*3+i] = isWall;
+      // this.nearby[j*3+i] = isWall;
       
       if (isWall) {
         this.colliderBounds.moveTo(globalX, globalY);
@@ -135,39 +135,39 @@ Player.prototype.draw = function(ctx, camera) {
   ctx.arc(this.drawBounds.centerX, this.drawBounds.centerY, this.drawBounds.width * Player.DRAW_RADIUS, 0, 2*Math.PI);
   ctx.fill();
   
-  ctx.beginPath();
-  ctx.arc(this.drawBounds.centerX, this.drawBounds.centerY, this.drawBounds.width * this.bounds.radius, 0, 2*Math.PI);
-  ctx.stroke();
+  // ctx.beginPath();
+  // ctx.arc(this.drawBounds.centerX, this.drawBounds.centerY, this.drawBounds.width * this.bounds.radius, 0, 2*Math.PI);
+  // ctx.stroke();
   
-  ctx.strokeStyle = "#ffffff";
+  // ctx.strokeStyle = "#ffffff";
   
-  var closestX = Math.floor(this.bounds.centerX);
-  var closestY = Math.floor(this.bounds.centerY);
-  this.drawBounds.moveTo(closestX, closestY);
-  this.drawBounds.resize(1,1);
-  this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
-  ctx.strokeRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
+  // var closestX = Math.floor(this.bounds.centerX);
+  // var closestY = Math.floor(this.bounds.centerY);
+  // this.drawBounds.moveTo(closestX, closestY);
+  // this.drawBounds.resize(1,1);
+  // this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
+  // ctx.strokeRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
   
-  ctx.strokeStyle = "#ff0000";
-  for (var i = 0; i < this.nearby.length; ++i) {
-    if (this.nearby[i]) {
-      var offsetX = (i % 3) - 1;
-      var offsetY = Math.floor(i / 3) - 1;
+  // ctx.strokeStyle = "#ff0000";
+  // for (var i = 0; i < this.nearby.length; ++i) {
+    // if (this.nearby[i]) {
+      // var offsetX = (i % 3) - 1;
+      // var offsetY = Math.floor(i / 3) - 1;
       
-      this.drawBounds.moveTo(closestX + offsetX, closestY + offsetY);
-      this.drawBounds.resize(1,1);
-      this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
-      ctx.strokeRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
-    }
-  }
+      // this.drawBounds.moveTo(closestX + offsetX, closestY + offsetY);
+      // this.drawBounds.resize(1,1);
+      // this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
+      // ctx.strokeRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
+    // }
+  // }
   
-  var i = 0;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-  for (var prop in this.keys) {
-    ctx.fillText(prop + ': '+ this.keys[prop], 0, i * 12);
-    ++i;
-  }
+  // var i = 0;
+  // ctx.textAlign = 'left';
+  // ctx.textBaseline = 'top';
+  // for (var prop in this.keys) {
+    // ctx.fillText(prop + ': '+ this.keys[prop], 0, i * 12);
+    // ++i;
+  // }
   
   // ctx.drawImage(this.sprite, this.animFrame * this.sourceBounds.width, this.facing * this.sourceBounds.height, this.sourceBounds.width, this.sourceBounds.height, 
       // this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
