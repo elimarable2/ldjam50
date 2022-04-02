@@ -1,5 +1,5 @@
 function Mold(x,y) {
-  this.bounds = new Rectangle(x,y,1);
+  this.bounds = new Circle(x + 0.5,y + 0.5,0.5);
   this.drawBounds = new Rectangle(this.bounds);
 }
 

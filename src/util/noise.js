@@ -188,6 +188,21 @@ function buffer_apply(buffer, fn) {
   return buffer;
 }
 
+function buffer_copy(source) {
+  var height = source.length;
+  var width = source[0].length;
+  var buffer = [];
+  
+  for (var j = 0; j < height; ++j) {
+    buffer[j] = [];
+    for (var i = 0; i < width; ++i) {
+      buffer[j][i] = source[j][i];
+    }
+  }
+  
+  return buffer;
+}
+
 function cull(input, startX, startY) {
   var height = input.length;
   var width = input[0].length;

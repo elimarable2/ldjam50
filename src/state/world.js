@@ -17,6 +17,7 @@ function World(spec, cost) {
   this.cameraControl.jumpToTarget();
   
   this.coins = [];
+  this.mold = [];
   this.totalCoins = 0;
   this.portalTimer = 0;
   
@@ -53,6 +54,9 @@ function World(spec, cost) {
       }
       if (this.spec[j][i] === 2) {
         this.coins.push(new Coin(i,j));
+      }
+      if (this.spec[j][i] === 3) {
+        this.mold.push(new Mold(i,j));
       }
     }
   }
@@ -127,6 +131,11 @@ World.prototype.draw = function (ctx) {
     }
   }
   
+  for (var i = 0; i < this.mold.length; ++i) {
+    this.mold[i].draw(ctx, this.camera);
+  }
+  
+  ctx.lineWidth = 1;
   this.drawMinimap(ctx);
   
   if (this.totalCoins < this.cost) {
@@ -144,7 +153,6 @@ World.prototype.draw = function (ctx) {
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
   ctx.font = 'bold 20px monospace';
-  ctx.lineWidth = 1;
 
   if (this.totalCoins < this.cost) {
     ctx.strokeStyle = "#202020";  
@@ -264,8 +272,8 @@ function generateWorld(width, height, coins, cost) {
   buffer_apply(noiseMap, function (value, x, y) {
     if (x > 0
       && y > 0
-      && x < width
-      && y < height
+      && x < width - 1
+      && y < height - 1
       && value === 0) {
       if (noiseMap[y][x - 1] === 1
         && noiseMap[y - 1][x] === 1
@@ -295,6 +303,31 @@ function generateWorld(width, height, coins, cost) {
       }
     }
   }
+  
+  // Add mold
+  var moldMap = buffer_copy(noiseMap);
+  buffer_apply(moldMap, function (value, x, y) {
+    if (x > 0
+      && y > 0
+      && x < width - 1
+      && y < height - 1
+      && value === 0) {
+      if (noiseMap[y][x - 1] === 1
+        || noiseMap[y - 1][x] === 1
+        || noiseMap[y][x + 1] === 1
+        || noiseMap[y + 1][x] === 1) {
+        return Math.random() > 0.9 ? 1 : 0;
+      }
+    }
+    return 0;
+  });
+  
+  buffer_apply(noiseMap, function (value, x, y) {
+    if (moldMap[y][x] === 1) {
+      return 3;
+    }
+    return value;
+  });
   
   return new World(noiseMap, cost);
 }
