@@ -11,45 +11,27 @@ Camera.prototype.moveTo = function () {
 Camera.prototype.moveCenterTo = function () {
   this.bounds.moveCenterTo.apply(this.bounds, arguments);
 };
-Camera.prototype.getScale = function () {
-  return Game.TILE_SIZE * Game.WIDTH / Game.BASE_WIDTH;
-};
 Camera.prototype.worldPos = function (screenX, screenY, out) {
-  var scale = this.getScale();
-  var offsetLeft = this.bounds.left;
-  var offsetTop = this.bounds.top;
+  var viewport = this.getViewport();
   if (!out) out = {};
-  out.x = screenX / scale + offsetLeft;
-  out.y = screenY / scale + offsetTop;
-  return out;
-};
-Camera.prototype.tilePos = function (screenX, screenY, out) {
-  var scale = this.getScale();
-  var offsetLeft = this.bounds.left;
-  var offsetTop = this.bounds.top;
-  if (!out) out = {};
-  out.x = Math.floor(screenX / scale + offsetLeft);
-  out.y = Math.floor(screenY / scale + offsetTop);
+  out.x = screenX / viewport.width * this.bounds.width + this.bounds.left;
+  out.y = screenY / viewport.height * this.bounds.height + this.bounds.top;
   return out;
 };
 Camera.prototype.screenPos = function (worldX, worldY, out) {
-  var scale = this.getScale();
-  var offsetLeft = this.bounds.left;
-  var offsetTop = this.bounds.top;
+  var viewport = this.getViewport();
   if (!out) out = {};
-  out.x = Math.floor((worldX - offsetLeft) * scale);
-  out.y = Math.floor((worldY - offsetTop) * scale);
+  out.x = Math.floor((worldX - this.bounds.left) / this.bounds.width * viewport.width);
+  out.y = Math.floor((worldY - this.bounds.top) / this.bounds.height * viewport.height);
   return out;
 };
 Camera.prototype.worldRect = function (screenRect, out) {
-  var scale = this.getScale();
-  var offsetLeft = this.bounds.left;
-  var offsetTop = this.bounds.top;
+  var viewport = this.getViewport();
   if (!screenRect) screenRect = this.getViewport();
   if (!out) out = new Rectangle(screenRect);
-  out.left = screenRect.left / scale + offsetLeft;
-  out.top = screenRect.top / scale + offsetTop;
-  out.resize(screenRect.width / scale, screenRect.height / scale);
+  out.left = screenRect.left / viewport.width * this.bounds.width + this.bounds.left;
+  out.top = screenRect.top / viewport.height * this.bounds.height + this.bounds.top;
+  out.resize(screenRect.width / viewport.width * this.bounds.width, screenRect.height / viewport.height * this.bounds.height);
   return out;
 };
 Camera.prototype.screenRect = function (worldRect, out) {
