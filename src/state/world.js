@@ -353,7 +353,7 @@ function generateWorld(width, height, coins, cost) {
   for (var i = 0; i < coins; ++i) {
     while (true) {
       var a = Math.random() * 2 * Math.PI;
-      var d = Math.random() * (2 * minorAxis / 5 - 5) + 5;
+      var d = (1 - Math.pow(Math.random(),2)) * (2 * minorAxis / 5 - 5) + 5;
       var u = Math.floor(Math.cos(a) * d + minorAxis / 2);
       var v = Math.floor(Math.sin(a) * d + minorAxis / 2);
       
