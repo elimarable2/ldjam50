@@ -1,5 +1,5 @@
 function Coin(x,y) {
-  this.bounds = new Circle(x + 0.5,y + 0.5,0.5);
+  this.bounds = new Circle(x + 0.5,y + 0.5,0.7);
   this.drawBounds = new Rectangle(this.bounds);
   
   this.active = true;
