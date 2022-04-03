@@ -14,8 +14,10 @@ function TitleCard() {
 TitleCard.TOTAL_FADE_TIME = 2000;
 
 TitleCard.prototype.onEnter = function () {
-  // MUSIC.stopAll();
-  // MUSIC.play(MUSIC.main.get());
+  if (!Game.audio.music.get().isPlaying) {
+    MUSIC.stopAll();
+    MUSIC.play(Game.audio.music.get());
+  }
 };
 TitleCard.prototype.step = function (elapsed) {
   if (this.transition) {

@@ -57,7 +57,8 @@ var Game = {
     Game.audio = {
       'coin': SOUND.load(Game.loader, 'assets/coin.wav'),
       'portal': SOUND.load(Game.loader, 'assets/portal.wav'),
-      'hurt': SOUND.load(Game.loader, 'assets/hurt.wav')
+      'hurt': SOUND.load(Game.loader, 'assets/hurt.wav'),
+      'music': MUSIC.load(Game.loader, 'assets/music.ogg')
     };
     
     function loadImage(path) {
