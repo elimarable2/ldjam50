@@ -21,6 +21,8 @@ function Player(x,y) {
   };
   
   this.nearby = [];
+  
+  this.bobTime = 0;
 }
 
 Player.DRAW_RADIUS = 0.4;
@@ -28,6 +30,14 @@ Player.MAX_SPEED = 0.007;
 Player.ACCELERATION_START = 0.003;
 Player.ACCELERATION_STOP = 0.01;
 Player.ANGLE_CHANGE = Math.PI * 0.002;
+
+Player.BOB_PERIOD = 2000;
+Player.BOB_OFFSET = 0.2;
+Player.BOB_SPEED_FACTOR = 1.5;
+Player.SHADOW_OFFSET = 0.5;
+Player.SHADOW_BOB_AMOUNT = 0.2;
+Player.SHADOW_WIDTH = 2 * Player.DRAW_RADIUS - Player.SHADOW_BOB_AMOUNT;
+Player.SHADOW_HEIGHT = Player.SHADOW_WIDTH / 2;
 
 Player.prototype.update = function(elapsed, world) {
   this.targetVelocity.x = 0;
@@ -104,16 +114,31 @@ Player.prototype.update = function(elapsed, world) {
   this.animationUpdate(elapsed);
 };
 Player.prototype.animationUpdate = function (elapsed) {
+  var vm = Math.sqrt(this.velocity.x*this.velocity.x+this.velocity.y*this.velocity.y);
+  
+  this.bobTime += elapsed * (1 + vm * Player.BOB_SPEED_FACTOR);
 };
 Player.prototype.draw = function(ctx, camera) {
+  var bobPosition = Math.sin(this.bobTime * 2 * Math.PI / Player.BOB_PERIOD);
+  var shadowBob = 1 + bobPosition * Player.SHADOW_BOB_AMOUNT;
+  
+  // Draw shadow
+  this.drawBounds.copyFrom(this.bounds);
+  this.drawBounds.resizeCentered(Player.SHADOW_WIDTH * shadowBob,Player.SHADOW_HEIGHT * shadowBob);
+  this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
+  
+  ctx.fillStyle = "rgba(0,0,0,0.5)";
+  ctx.beginPath();
+  ctx.ellipse(this.drawBounds.centerX, this.drawBounds.centerY, this.drawBounds.width / 2, this.drawBounds.height / 2, 0, 0, 2*Math.PI);
+  ctx.fill();
+  
+  // Draw character
   this.drawBounds.copyFrom(this.bounds);
   this.drawBounds.resizeCentered(1,1);
+  this.drawBounds.moveBy(0, bobPosition * Player.BOB_OFFSET - Player.SHADOW_OFFSET);
   this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
   
   ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "#0000ff";
-  // ctx.fillRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
-  
   ctx.beginPath();
   ctx.arc(this.drawBounds.centerX, this.drawBounds.centerY, this.drawBounds.width * Player.DRAW_RADIUS, 0, 2*Math.PI);
   ctx.fill();
