@@ -85,6 +85,7 @@ World.prototype.onEnter = function () {
 };
 World.prototype.step = function (elapsed) {
   this.player.update(elapsed, this);
+  this.portal.update(elapsed, this);
   this.cameraControl.step(elapsed);
   
   for (var i = 0; i < this.coins.length; ++i) {
@@ -126,7 +127,6 @@ World.prototype.step = function (elapsed) {
     
     var zoomRatio = this.portalTimer / World.PORTAL_TIME;
     var zoomAmount = zoomRatio * World.PORTAL_ZOOM + (1 - zoomRatio) * World.MAJOR_AXIS_TILES;
-    console.log(zoomRatio, zoomAmount);
     this.camera.aspectRatio[0] = zoomAmount;
     this.camera.aspectRatio[1] = zoomAmount * 9 / 16;
     this.camera.updateBounds();
