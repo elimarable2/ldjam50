@@ -17,7 +17,7 @@ function World(spec, cost) {
   this.cameraControl.jumpToTarget();
   
   this.coins = [];
-  this.mold = [];
+  this.mold = new MoldLayer(this.width, this.height);
   this.totalCoins = 0;
   this.portalTimer = 0;
   this.moldTimer = 0;
@@ -44,7 +44,7 @@ function World(spec, cost) {
   bctx.fillRect(0,0,this.backplane.width,this.backplane.height);
   
   for (var j = 0; j < this.height; ++j) {
-    this.mold[j] = [];
+    // this.mold[j] = [];
     for (var i = 0; i < this.width; ++i) {
       if (this.spec[j][i] !== 0) {
         var node = Math.floor(Math.random() * 32+32);
@@ -61,7 +61,8 @@ function World(spec, cost) {
         this.coins.push(new Coin(i,j));
       }
       if (this.spec[j][i] === 3) {
-        this.mold[j][i] = new Mold(i,j);
+        // this.mold[j][i] = new Mold(i,j);
+        this.mold.add(i,j);
       }
     }
   }
@@ -94,26 +95,28 @@ World.prototype.step = function (elapsed) {
     }
   }
   
-  var touchingMold = false;
-  for (var j = 0; j < this.mold.length; ++j) {
-    for (var i = 0; i < this.mold[j].length; ++i) {
-      if (this.mold[j][i] && this.mold[j][i]) {
-        this.mold[j][i].update(elapsed, this);
-        if (!touchingMold && this.player.bounds.intersect(this.mold[j][i].bounds)) {
-          touchingMold = true;
-        }
-      }
-    }
-  }
-  if (touchingMold) {
-    this.moldTimer += elapsed;
-    if (this.moldTimer > World.MOLD_TIME) {
-      Game.setState(new TitleCard());
-    }
-  } else {
-      this.moldTimer -= elapsed;
-      if (this.moldTimer < 0) this.moldTimer = 0;
-  }
+  this.mold.update(elapsed, this);
+  
+  // var touchingMold = false;
+  // for (var j = 0; j < this.mold.length; ++j) {
+    // for (var i = 0; i < this.mold[j].length; ++i) {
+      // if (this.mold[j][i] && this.mold[j][i]) {
+        // this.mold[j][i].update(elapsed, this);
+        // if (!touchingMold && this.player.bounds.intersect(this.mold[j][i].bounds)) {
+          // touchingMold = true;
+        // }
+      // }
+    // }
+  // }
+  // if (touchingMold) {
+    // this.moldTimer += elapsed;
+    // if (this.moldTimer > World.MOLD_TIME) {
+      // Game.setState(new TitleCard());
+    // }
+  // } else {
+      // this.moldTimer -= elapsed;
+      // if (this.moldTimer < 0) this.moldTimer = 0;
+  // }
   
   if (this.totalCoins >= this.cost) {
     if (this.portal.bounds.intersect(this.player.bounds)) {
@@ -158,15 +161,16 @@ World.prototype.draw = function (ctx) {
     this.sourceBounds.left, this.sourceBounds.top, this.sourceBounds.width, this.sourceBounds.height,
     this.destBounds.left, this.destBounds.top, this.destBounds.width, this.destBounds.height);
   
-  for (var j = 0; j < this.mold.length; ++j) {
-    for (var i = 0; i < this.mold[j].length; ++i) {
-      if (this.mold[j][i]) {
-        if (this.mold[j][i].bounds.intersect(this.camera.bounds)) {
-          this.mold[j][i].draw(ctx, this.camera);
-        }
-      }
-    }
-  }
+  this.mold.draw(ctx,this.camera);
+  // for (var j = 0; j < this.mold.length; ++j) {
+    // for (var i = 0; i < this.mold[j].length; ++i) {
+      // if (this.mold[j][i]) {
+        // if (this.mold[j][i].bounds.intersect(this.camera.bounds)) {
+          // this.mold[j][i].draw(ctx, this.camera);
+        // }
+      // }
+    // }
+  // }
   
   // ctx.drawImage(this.backplane,0,0,Game.WIDTH,Game.HEIGHT);
     
