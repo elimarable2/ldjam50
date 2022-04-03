@@ -122,7 +122,9 @@ World.prototype.step = function (elapsed) {
     if (this.coins[i].active) {
       this.coins[i].update(elapsed);
       if (this.coins[i].bounds.intersect(this.player.bounds)) {
-        SOUND.play(Game.audio.coin.get());
+        var note = 220 + 660/12 * Math.floor(12 * Math.random());
+        
+        SOUND.play(Game.audio.coin.get(), {detune: note});
         this.coins[i].active = false;
         ++this.totalCoins;
       }

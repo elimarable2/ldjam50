@@ -12,6 +12,9 @@ AudioObject.prototype.play = function (options) {
     source.connect(this.parentCollection.gainNode);
     source.connect(this.parentCollection.audioContext.destination);
     source.loop = playOptions.loop;
+    if (options.detune !== undefined) {
+      source.detune.value = options.detune;
+    }
     source.addEventListener('ended', function () {
       _self.sources.splice(_self.sources.indexOf(source), 1);
       if (_self.sources.length <= 0) _self.isPlaying = false;
