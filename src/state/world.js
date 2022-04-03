@@ -92,6 +92,7 @@ World.prototype.step = function (elapsed) {
     if (this.coins[i].active) {
       this.coins[i].update(elapsed);
       if (this.coins[i].bounds.intersect(this.player.bounds)) {
+        SOUND.play(Game.audio.coin.get());
         this.coins[i].active = false;
         ++this.totalCoins;
       }

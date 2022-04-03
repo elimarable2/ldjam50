@@ -53,6 +53,10 @@ var Game = {
         
     // SOUND.startDrag = SOUND.load(Game.loader,'assets/start_drag.wav');
     // MUSIC.main = MUSIC.load(Game.loader,'assets/music.ogg');
+        
+    Game.audio = {
+      'coin': SOUND.load('assets/coin.wav')
+    }
     
     function loadImage(path) {
       return Game.loader.register(path, "blob", function (data, callback) {
