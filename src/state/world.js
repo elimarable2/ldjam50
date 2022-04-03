@@ -194,47 +194,7 @@ World.prototype.draw = function (ctx) {
   }
   
   ctx.lineWidth = 1;
-  this.drawMinimap(ctx);
-  
-  if (this.totalCoins < this.cost) {
-    ctx.globalAlpha = 0.5;
-  } else {
-    ctx.globalAlpha = 1;
-  }
-  ctx.fillStyle = "#b000ff";  
-  ctx.beginPath();
-  ctx.arc(Game.WIDTH - 20, 20, 10, 0, 2*Math.PI);
-  ctx.fill();
-  
-  ctx.globalAlpha = 1;
-  
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-  ctx.font = 'bold 20px monospace';
-
-  if (this.totalCoins < this.cost) {
-    ctx.strokeStyle = "#202020";  
-    ctx.fillStyle = "#606060";  
-  } else if (coinsLeft > 0) {
-    ctx.strokeStyle = "#606060";  
-    ctx.fillStyle = "#ffffff";  
-  } else { 
-    ctx.strokeStyle = "#605000";  
-    ctx.fillStyle = "#fff000"; 
-  }
-  ctx.fillText(' / ' + this.cost, Game.WIDTH - 40, 20);
-  ctx.strokeText(' / ' + this.cost, Game.WIDTH - 40, 20);
-  var costMetrics = ctx.measureText(' / ' + this.cost);  
-  
-  ctx.fillText(this.totalCoins, Game.WIDTH - 40 - costMetrics.width, 20);
-  ctx.strokeText(this.totalCoins, Game.WIDTH - 40 - costMetrics.width, 20);
-  
-  if (this.fadeTimer > 0) {
-    ctx.globalAlpha = this.fadeTimer / World.FADE_TIME;
-    ctx.fillStyle = this.fadeStyle;
-    ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
-    ctx.globalAlpha = 1;
-  }
+  // this.drawMinimap(ctx);
   
   if (this.moldTimer > 0) {
     ctx.filter = 'blur(0px)';
@@ -249,12 +209,22 @@ World.prototype.draw = function (ctx) {
     ctx.fillRect(0,0,Game.WIDTH,Game.WIDTH);
     ctx.scale(1, Game.WIDTH / Game.HEIGHT);
   }
+  
+  this.drawHUD(ctx, coinsLeft);
+  
   if (this.moldTimer > World.MOLD_TIME - 1000) {
     ctx.globalAlpha = (this.moldTimer - World.MOLD_TIME + 1000) / 1000;
     ctx.fillStyle = '#000000';
     ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
     ctx.globalAlpha = 1;
   }
+  if (this.fadeTimer > 0) {
+    ctx.globalAlpha = this.fadeTimer / World.FADE_TIME;
+    ctx.fillStyle = this.fadeStyle;
+    ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
+    ctx.globalAlpha = 1;
+  }
+  
   
   // this.cameraControl.debugDraw(ctx);
 };
@@ -290,6 +260,40 @@ World.prototype.drawMinimap = function (ctx) {
   var dl = this.player.bounds.centerX * scale_map;
   var dr = this.player.bounds.centerY * scale_map;
   ctx.fillRect(Math.floor(dl - ds/2), Math.floor(dr - ds/2), ds, ds);
+};
+World.prototype.drawHUD = function (ctx, coinsLeft) {
+  if (this.totalCoins < this.cost) {
+    ctx.globalAlpha = 0.5;
+  } else {
+    ctx.globalAlpha = 1;
+  }
+  ctx.fillStyle = "#b000ff";  
+  ctx.beginPath();
+  ctx.arc(Game.WIDTH - 20, 20, 10, 0, 2*Math.PI);
+  ctx.fill();
+  
+  ctx.globalAlpha = 1;
+  
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 20px monospace';
+
+  if (this.totalCoins < this.cost) {
+    ctx.strokeStyle = "#202020";  
+    ctx.fillStyle = "#606060";  
+  } else if (coinsLeft > 0) {
+    ctx.strokeStyle = "#606060";  
+    ctx.fillStyle = "#ffffff";  
+  } else { 
+    ctx.strokeStyle = "#605000";  
+    ctx.fillStyle = "#fff000"; 
+  }
+  ctx.fillText(' / ' + this.cost, Game.WIDTH - 40, 20);
+  ctx.strokeText(' / ' + this.cost, Game.WIDTH - 40, 20);
+  var costMetrics = ctx.measureText(' / ' + this.cost);  
+  
+  ctx.fillText(this.totalCoins, Game.WIDTH - 40 - costMetrics.width, 20);
+  ctx.strokeText(this.totalCoins, Game.WIDTH - 40 - costMetrics.width, 20);
 };
 World.prototype.keydown = function (ev) {
   this.player.keydown(ev);
