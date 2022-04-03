@@ -97,6 +97,12 @@ World.prototype.step = function (elapsed) {
   
   this.mold.update(elapsed, this);
   
+  var ptx = Math.floor(this.player.bounds.centerX);
+  var pty = Math.floor(this.player.bounds.centerY);
+  var touchingMold = this.mold.at(ptx,pty);
+  
+  
+  
   // var touchingMold = false;
   // for (var j = 0; j < this.mold.length; ++j) {
     // for (var i = 0; i < this.mold[j].length; ++i) {
@@ -108,15 +114,15 @@ World.prototype.step = function (elapsed) {
       // }
     // }
   // }
-  // if (touchingMold) {
-    // this.moldTimer += elapsed;
-    // if (this.moldTimer > World.MOLD_TIME) {
-      // Game.setState(new TitleCard());
-    // }
-  // } else {
-      // this.moldTimer -= elapsed;
-      // if (this.moldTimer < 0) this.moldTimer = 0;
-  // }
+  if (touchingMold) {
+    this.moldTimer += elapsed;
+    if (this.moldTimer > World.MOLD_TIME) {
+      Game.setState(new TitleCard());
+    }
+  } else {
+      this.moldTimer -= elapsed;
+      if (this.moldTimer < 0) this.moldTimer = 0;
+  }
   
   if (this.totalCoins >= this.cost) {
     if (this.portal.bounds.intersect(this.player.bounds)) {

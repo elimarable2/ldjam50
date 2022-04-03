@@ -24,6 +24,9 @@ function MoldLayer(width, height) {
 
 MoldLayer.TILE_SIZE = 96;
 
+MoldLayer.prototype.at = function (x,y) {
+  return this.allMold[y][x];
+};
 MoldLayer.prototype.add = function (x,y) {
   this.allMold[y][x] = 1;
   this.moldBuffer.push(new Mold(x,y,this.tickTime));
@@ -110,7 +113,7 @@ function Mold(x,y,tickTime) {
 }
 
 Mold.TICK_PERIOD = 1000;
-Mold.SPREAD_CHANCE = 1;
+Mold.SPREAD_CHANCE = 0.3;
 
 Mold.prototype.tick = function () {
   this.tickTime += Mold.TICK_PERIOD;
