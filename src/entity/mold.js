@@ -1,7 +1,11 @@
 function MoldLayer(width, height) {
+  this.width = width;
+  this.height = height;
+  
   this.backplane = document.createElement('canvas');
   this.backplane.width = this.width * MoldLayer.TILE_SIZE;
   this.backplane.height = this.height * MoldLayer.TILE_SIZE;
+  this.bctx = this.backplane.getContext('2d');
   
   this.moldBuffer = [];
   this.activeMold = [];
@@ -14,7 +18,8 @@ function MoldLayer(width, height) {
   }
   
   this.tickTime = 0;
-  this.drawBounds = new Rectangle();
+  this.sourceBounds = new Rectangle();
+  this.destBounds = new Rectangle();
 }
 
 MoldLayer.TILE_SIZE = 96;
@@ -22,9 +27,13 @@ MoldLayer.TILE_SIZE = 96;
 MoldLayer.prototype.add = function (x,y) {
   this.allMold[y][x] = 1;
   this.moldBuffer.push(new Mold(x,y,this.tickTime));
+  
+  this.bctx.fillStyle = '#00ff00';
+  this.bctx.fillRect(x * MoldLayer.TILE_SIZE, y * MoldLayer.TILE_SIZE, MoldLayer.TILE_SIZE, MoldLayer.TILE_SIZE);
 };
 MoldLayer.prototype.update = function (elapsed, world) {
   this.tickTime += elapsed;
+  // Tick all molds that should update this frame
   while (this.activeMold.length > 0 && this.activeMold[0].tickTime < this.tickTime) {
     var mold = this.activeMold.shift();
     var doSpread = mold.tick();
@@ -37,7 +46,9 @@ MoldLayer.prototype.update = function (elapsed, world) {
     }
   }
   
+  // Insert all new molds in the proper place in the array
   if (this.moldBuffer.length > 0) {
+    // Sort the mold buffer low-to-high
     this.moldBuffer.sort(function (a,b) {
       return a.tickTime - b.tickTime;
     });
@@ -45,11 +56,14 @@ MoldLayer.prototype.update = function (elapsed, world) {
     var i = 0;
     while (this.moldBuffer.length > 0) {
       if (i >= this.activeMold.length) {
+        // Add remaining mold to the end of the array
         this.activeMold.push(this.moldBuffer.shift());
       } else {
         if (this.moldBuffer[0].tickTime < this.activeMold[i].tickTime) {
+          // Swap the current buffer into the active array
           var swap = this.activeMold[i];
           this.activeMold[i] = this.moldBuffer.shift();
+          // Insert the active mold into the buffer, preserving the sort
           var insertionPoint = this.moldBuffer.findIndex(function (x) { return x.tickTime > swap.tickTime; });
           this.moldBuffer.splice(1,0,swap);
         }
@@ -79,20 +93,13 @@ MoldLayer.prototype.spread = function (x,y,world) {
   return spread.length > 1;
 };
 MoldLayer.prototype.draw = function (ctx, camera) {
-  this.drawBounds.moveTo(0,0);
-  this.drawBounds.resize(1,1);
-  this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
-  
-    ctx.fillStyle = '#00ff00';
-    
-  for (var i = 0; i < this.activeMold.length; ++i) {
-    var m = this.activeMold[i];
-    var dl = m.x * this.drawBounds.width + this.drawBounds.left;
-    var dt = m.y * this.drawBounds.height + this.drawBounds.top;
-    ctx.globalAlpha = 1 - i / this.activeMold.length;
-    ctx.fillRect(dl,dt,this.drawBounds.width, this.drawBounds.height);
-  }
-  ctx.globalAlpha = 1;
+  this.sourceBounds.copyFrom(camera.bounds);
+  this.sourceBounds.moveTo(this.sourceBounds.left * World.TILE_SIZE, this.sourceBounds.top * World.TILE_SIZE);
+  this.sourceBounds.resizeBy(World.TILE_SIZE);
+  this.destBounds = camera.screenRect(camera.bounds,this.destBounds);
+  ctx.drawImage(this.backplane, 
+    this.sourceBounds.left, this.sourceBounds.top, this.sourceBounds.width, this.sourceBounds.height,
+    this.destBounds.left, this.destBounds.top, this.destBounds.width, this.destBounds.height);
 };
 
 function Mold(x,y,tickTime) {
@@ -111,42 +118,4 @@ Mold.prototype.tick = function () {
     return true;
   }
   return false;
-};
-Mold.prototype.spread = function (world) {
-  var x = Math.floor(this.bounds.centerX);
-  var y = Math.floor(this.bounds.centerY);
-  var spread = [];
-  if (world.spec[y][x-1] !== 0 && !world.mold[y][x-1]) {
-    spread.push([x-1,y]);
-  }
-  if (world.spec[y-1][x] !== 0 && !world.mold[y-1][x]) {
-    spread.push([x,y-1]);
-  }
-  if (world.spec[y][x+1] !== 0 && !world.mold[y][x+1]) {
-    spread.push([x+1,y]);
-  }
-  if (world.spec[y+1][x] !== 0 && !world.mold[y+1][x]) {
-    spread.push([x,y+1]);
-  }
-  if (spread.length > 0) {
-    var pick = Math.floor(Math.random() & spread.length);
-    var nextX = spread[pick][0];
-    var nextY = spread[pick][1];
-    world.mold[nextY][nextX] = new Mold(nextX, nextY);
-  }
-  if (spread.length <= 1) {
-    this.active = false;
-  }
-};
-Mold.prototype.draw = function(ctx, camera, active) {
-  this.drawBounds.copyFrom(this.bounds);
-  this.drawBounds = camera.screenRect(this.drawBounds, this.drawBounds);
-  
-  if (this.active) {
-    ctx.fillStyle = "#00ff00";
-  } else {
-    ctx.fillStyle = "#008000";
-  }
-  
-  ctx.fillRect(this.drawBounds.left, this.drawBounds.top, this.drawBounds.width, this.drawBounds.height);
 };
