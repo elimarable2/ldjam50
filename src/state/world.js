@@ -90,6 +90,7 @@ World.prototype.step = function (elapsed) {
   
   for (var i = 0; i < this.coins.length; ++i) {
     if (this.coins[i].active) {
+      this.coins[i].update(elapsed);
       if (this.coins[i].bounds.intersect(this.player.bounds)) {
         this.coins[i].active = false;
         ++this.totalCoins;
