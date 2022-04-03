@@ -55,13 +55,14 @@ Camera.prototype.getViewport = function () {
   }
 };
 Camera.prototype.updateBounds = function () {
+  var zoomed = this.bounds.width !== this.aspectRatio[0] && this.bounds.width !== this.aspectRatio[1];
   var x = this.bounds.centerX;
   var y = this.bounds.centerY;
-  if (Game.WIDTH > Game.HEIGHT && this.bounds.width < this.bounds.height) {
+  if (Game.WIDTH > Game.HEIGHT && (this.bounds.width < this.bounds.height || zoomed)) {
     this.bounds.resize(this.aspectRatio[0], this.aspectRatio[1]);
     this.bounds.moveCenterTo(x,y);
   }
-  else if (Game.WIDTH < Game.HEIGHT && this.bounds.width > this.bounds.height) {
+  else if (Game.WIDTH < Game.HEIGHT && (this.bounds.width > this.bounds.height || zoomed)) {
     this.bounds.resize(this.aspectRatio[1], this.aspectRatio[0]);
     this.bounds.moveCenterTo(x,y);
   }

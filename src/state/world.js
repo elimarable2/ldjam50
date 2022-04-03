@@ -74,6 +74,7 @@ function World(spec, cost) {
 World.MAJOR_AXIS_TILES = 30;
 World.TILE_SIZE = 96;
 World.PORTAL_TIME = 1500;
+World.PORTAL_ZOOM = 20;
 World.MOLD_TIME = 3000;
 World.MOLD_BLUR = 20;
 World.FADE_TIME = 2000;
@@ -115,12 +116,20 @@ World.prototype.step = function (elapsed) {
       if (this.portalTimer > World.PORTAL_TIME) {
         var nextState = generateLevel(this.index +1);
         nextState.totalCoins = this.totalCoins - this.cost;
+        nextState.fadeStyle = '#ffffff';
         Game.setState(nextState);
       }
     } else {
       this.portalTimer -= elapsed;
       if (this.portalTimer < 0) this.portalTimer = 0;
     }
+    
+    var zoomRatio = this.portalTimer / World.PORTAL_TIME;
+    var zoomAmount = zoomRatio * World.PORTAL_ZOOM + (1 - zoomRatio) * World.MAJOR_AXIS_TILES;
+    console.log(zoomRatio, zoomAmount);
+    this.camera.aspectRatio[0] = zoomAmount;
+    this.camera.aspectRatio[1] = zoomAmount * 9 / 16;
+    this.camera.updateBounds();
   }
   
   this.animationStep(elapsed);
@@ -186,6 +195,12 @@ World.prototype.draw = function (ctx) {
   
   this.drawHUD(ctx, coinsLeft);
   
+  if (this.portalTimer > World.PORTAL_TIME - 1000) {
+    ctx.globalAlpha = (this.portalTimer - World.PORTAL_TIME + 1000) / 1000;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
+    ctx.globalAlpha = 1;
+  }
   if (this.moldTimer > World.MOLD_TIME - 1000) {
     ctx.globalAlpha = (this.moldTimer - World.MOLD_TIME + 1000) / 1000;
     ctx.fillStyle = '#000000';
