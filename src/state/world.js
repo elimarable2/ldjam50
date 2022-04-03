@@ -255,6 +255,8 @@ World.prototype.draw = function (ctx) {
     ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
     ctx.globalAlpha = 1;
   }
+  
+  // this.cameraControl.debugDraw(ctx);
 };
 World.prototype.drawMinimap = function (ctx) {
   var scale_map = 160 / this.minimap.width;  
