@@ -67,6 +67,23 @@ function World(spec, cost) {
     }
   }
   
+  if (!World.sound) {
+    World.sound = {};
+    
+    World.sound.portal = SOUND.audioContext.createBufferSource();
+    World.sound.portal.buffer = Game.audio.portal.get().buffer;
+    
+    World.sound.portalGain = SOUND.audioContext.createGain();
+    World.sound.portalGain.connect(SOUND.audioContext.destination);
+    World.sound.portalGain.gain.value = -1;
+    
+    World.sound.portal.connect(World.sound.portalGain);
+    World.sound.portal.connect(SOUND.audioContext.destination);
+    World.sound.portal.loop = true;
+    
+    World.sound.portal.start(0);
+  }
+  
   this.sourceBounds = new Rectangle();
   this.destBounds = new Rectangle();
 }
@@ -135,6 +152,16 @@ World.prototype.step = function (elapsed) {
   }
   
   this.animationStep(elapsed);
+  this.audioStep(elapsed);
+};
+World.prototype.audioStep = function (elapsed) {
+  if (this.portalTimer > 0) {
+    var gainValue = this.portalTimer / World.PORTAL_TIME - 1;
+    World.sound.portalGain.gain.value = gainValue;
+  } else if (World.sound.portalGain.gain.value > -1) {
+    var gainValue = this.fadeTimer / World.FADE_TIME - 1;
+    World.sound.portalGain.gain.value = gainValue;
+  }
 };
 World.prototype.animationStep = function (elapsed) {
   if (this.fadeDirection < 0) {
