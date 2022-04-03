@@ -93,8 +93,14 @@ Player.prototype.update = function(elapsed, world) {
       var globalX = closestX - 1 + i;
       var globalY = closestY - 1 + j;
       
+      if (globalX < 0
+        || globalY < 0
+        || globalX >= world.width
+        || globalY >= world.height) {
+        continue;  
+      }
+      
       var isWall = world.spec[globalY][globalX] === 0;
-      // this.nearby[j*3+i] = isWall;
       
       if (isWall) {
         this.colliderBounds.moveTo(globalX, globalY);

@@ -4,6 +4,7 @@ function TitleCard() {
 		y: NaN,
     pressed: false,
 	};
+  this.keyPressed = false;
   
   this.transition = false;
   this.fadeTime = TitleCard.TOTAL_FADE_TIME;
@@ -68,16 +69,22 @@ TitleCard.prototype.draw = function (ctx) {
   }
 };
 TitleCard.prototype.keydown = function (ev) {
+  this.keyPressed = true;
 };
 TitleCard.prototype.keyup = function (ev) {
-  this.transition = true;
+  if (this.keyPressed) {
+    this.transition = true;
+  }
+  this.keyPressed = false;
 };
 TitleCard.prototype.mousedown = function (ev) {
   this.mouse.pressed = true;
 };
 TitleCard.prototype.mouseup = function () {
+  if (this.mouse.pressed) {
+    this.transition = true;
+  }
   this.mouse.pressed = false;
-  this.transition = true;
 };
 TitleCard.prototype.mousemove = function (ev) {
   this.mouse.x = ev.pageX - canvasX;

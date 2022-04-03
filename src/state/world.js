@@ -144,7 +144,7 @@ World.prototype.draw = function (ctx) {
   if (this.moldTimer > 0) {
     ctx.filter = 'blur(' + World.MOLD_BLUR * this.moldTimer / World.MOLD_TIME + 'px)';
   } else {
-    ctx.filter = 'none';
+    ctx.filter = 'blur(0px)';
   }
   
   ctx.fillStyle = '#000000';
@@ -160,7 +160,11 @@ World.prototype.draw = function (ctx) {
   
   for (var j = 0; j < this.mold.length; ++j) {
     for (var i = 0; i < this.mold[j].length; ++i) {
-      if (this.mold[j][i]) this.mold[j][i].draw(ctx, this.camera);
+      if (this.mold[j][i]) {
+        if (this.mold[j][i].bounds.intersect(this.camera.bounds)) {
+          this.mold[j][i].draw(ctx, this.camera);
+        }
+      }
     }
   }
   
@@ -172,7 +176,9 @@ World.prototype.draw = function (ctx) {
   var coinsLeft = 0;
   for (var i = 0; i < this.coins.length; ++i) {
     if (this.coins[i].active) {
-      this.coins[i].draw(ctx, this.camera);
+      if (this.coins[i].bounds.intersect(this.camera.bounds)) {
+        this.coins[i].draw(ctx, this.camera);
+      }
       ++coinsLeft;
     }
   }
@@ -216,6 +222,26 @@ World.prototype.draw = function (ctx) {
   if (this.fadeTimer > 0) {
     ctx.globalAlpha = this.fadeTimer / World.FADE_TIME;
     ctx.fillStyle = this.fadeStyle;
+    ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
+    ctx.globalAlpha = 1;
+  }
+  
+  if (this.moldTimer > 0) {
+    ctx.filter = 'blur(0px)';
+    var vignetteSize = Game.WIDTH / 2;
+    var vignetteInner = (1 - this.moldTimer / World.MOLD_TIME) * vignetteSize;
+    var vignette = ctx.createRadialGradient(Game.WIDTH / 2, Game.WIDTH / 2, vignetteInner, Game.WIDTH / 2, Game.WIDTH / 2, vignetteInner + vignetteSize / 2);
+    vignette.addColorStop(0, 'transparent');
+    vignette.addColorStop(1, 'black');
+    
+    ctx.scale(1, Game.HEIGHT / Game.WIDTH);
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0,0,Game.WIDTH,Game.WIDTH);
+    ctx.scale(1, Game.WIDTH / Game.HEIGHT);
+  }
+  if (this.moldTimer > World.MOLD_TIME - 1000) {
+    ctx.globalAlpha = (this.moldTimer - World.MOLD_TIME + 1000) / 1000;
+    ctx.fillStyle = '#000000';
     ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
     ctx.globalAlpha = 1;
   }
