@@ -63,12 +63,6 @@ function World(spec, cost) {
     }
   }
   
-  // this.console = new GameConsole(getWorldConsoleDefinition(this));
-  
-  // this.spec = toColors(smoothNoise(this.baseNoise, 2));
-  
-  // this.spec = generateWorld();
-  
   this.sourceBounds = new Rectangle();
   this.destBounds = new Rectangle();
 }
@@ -238,27 +232,13 @@ World.prototype.drawMinimap = function (ctx) {
   ctx.fillRect(Math.floor(dl - ds/2), Math.floor(dr - ds/2), ds, ds);
 };
 World.prototype.keydown = function (ev) {
-  // this.console.keydown(ev);
   this.player.keydown(ev);
-  
-  if (ev.key === 'n') {
-    Game.setState(generateLevel(this.index+1));
-  }
 };
 World.prototype.keyup = function (ev) {
-  // this.console.keyup(ev);
   this.player.keyup(ev);
 };
 World.prototype.mousedown = function (ev) {
-  // if (!this.console.open) {
-    this.mouse.pressed = true;
-  // } 
-  
-  // ++this.blend;
-  // if (this.blend >= this.interpolation.length) this.blend = 0;
-  
-  // this.spec = toColors(valueNoise(this.baseNoise, 4, 0.5, this.interpolation[this.blend]));
-  
+  this.mouse.pressed = true;
 };
 World.prototype.mouseup = function () {
   this.mouse.pressed = false;
