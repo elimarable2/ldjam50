@@ -82,6 +82,19 @@ function World(spec, cost) {
     World.sound.portal.loop = true;
     
     World.sound.portal.start(0);
+    
+    World.sound.hurt = SOUND.audioContext.createBufferSource();
+    World.sound.hurt.buffer = Game.audio.hurt.get().buffer;
+    
+    World.sound.hurtGain = SOUND.audioContext.createGain();
+    World.sound.hurtGain.connect(SOUND.audioContext.destination);
+    World.sound.hurtGain.gain.value = -1;
+    
+    World.sound.hurt.connect(World.sound.hurtGain);
+    World.sound.hurt.connect(SOUND.audioContext.destination);
+    World.sound.hurt.loop = true;
+    
+    World.sound.hurt.start(0);
   }
   
   this.sourceBounds = new Rectangle();
@@ -123,6 +136,7 @@ World.prototype.step = function (elapsed) {
   if (this.mold.at(ptx,pty)) {
     this.moldTimer += elapsed;
     if (this.moldTimer > World.MOLD_TIME) {
+      World.sound.hurtGain.gain.linearRampToValueAtTime(-1, SOUND.audioContext.currentTime + 1);
       Game.setState(new TitleCard());
     }
   } else {
@@ -161,6 +175,13 @@ World.prototype.audioStep = function (elapsed) {
   } else if (World.sound.portalGain.gain.value > -1) {
     var gainValue = this.fadeTimer / World.FADE_TIME - 1;
     World.sound.portalGain.gain.value = gainValue;
+  }
+  
+  if (this.moldTimer > 0) {
+    var gainValue = this.moldTimer / World.MOLD_TIME - 1;
+    World.sound.hurtGain.gain.value = gainValue;
+  } else {
+    World.sound.hurtGain.gain.value = -1;
   }
 };
 World.prototype.animationStep = function (elapsed) {
