@@ -6,7 +6,7 @@ function TitleCard() {
 	};
   
   this.transition = false;
-  this.fadeTime = 0;
+  this.fadeTime = TitleCard.TOTAL_FADE_TIME;
   this.animTime = 0;
 }
 
@@ -22,11 +22,18 @@ TitleCard.prototype.step = function (elapsed) {
     if (this.fadeTime > TitleCard.TOTAL_FADE_TIME) {
       Game.setState(generateLevel(1));
     }
+  } else {
+    if (this.fadeTime > elapsed) {
+      this.fadeTime -= elapsed;
+    } else {
+      this.fadeTime = 0;
+    }
   }
   
   this.animTime += elapsed;
 };
 TitleCard.prototype.draw = function (ctx) {
+  ctx.filter = 'none';
   ctx.globalAlpha = 1;
   
   ctx.fillStyle = '#000000';
@@ -53,7 +60,7 @@ TitleCard.prototype.draw = function (ctx) {
   ctx.fillText("Press any key to begin", dx, dy, dw);
   ctx.strokeText("Press any key to begin", dx, dy, dw);
   
-  if (this.transition) {
+  if (this.fadeTime > 0) {
     ctx.globalAlpha = this.fadeTime / TitleCard.TOTAL_FADE_TIME;
     
     ctx.fillStyle = '#000000';

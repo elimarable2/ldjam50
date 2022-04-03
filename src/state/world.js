@@ -21,6 +21,9 @@ function World(spec, cost) {
   this.totalCoins = 0;
   this.portalTimer = 0;
   this.moldTimer = 0;
+  this.fadeTimer = World.FADE_TIME;
+  this.fadeDirection = -1;
+  this.fadeStyle = '#000000';
   
   this.layout = toColors(spec, function (value) {
     if (value === 0) return 'black';
@@ -71,6 +74,8 @@ World.MAJOR_AXIS_TILES = 30;
 World.TILE_SIZE = 96;
 World.PORTAL_TIME = 1500;
 World.MOLD_TIME = 3000;
+World.MOLD_BLUR = 20;
+World.FADE_TIME = 2000;
 
 World.prototype.onEnter = function () {
   // MUSIC.stopAll();
@@ -103,7 +108,7 @@ World.prototype.step = function (elapsed) {
   if (touchingMold) {
     this.moldTimer += elapsed;
     if (this.moldTimer > World.MOLD_TIME) {
-      Game.setState(generateLevel(1));
+      Game.setState(new TitleCard());
     }
   } else {
       this.moldTimer -= elapsed;
@@ -123,8 +128,25 @@ World.prototype.step = function (elapsed) {
       if (this.portalTimer < 0) this.portalTimer = 0;
     }
   }
+  
+  this.animationStep(elapsed);
+};
+World.prototype.animationStep = function (elapsed) {
+  if (this.fadeDirection < 0) {
+    if (this.fadeTimer > elapsed) {
+      this.fadeTimer -= elapsed;
+    } else {
+      this.fadeTimer = 0;
+    }
+  }
 };
 World.prototype.draw = function (ctx) {
+  if (this.moldTimer > 0) {
+    ctx.filter = 'blur(' + World.MOLD_BLUR * this.moldTimer / World.MOLD_TIME + 'px)';
+  } else {
+    ctx.filter = 'none';
+  }
+  
   ctx.fillStyle = '#000000';
   ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
   
@@ -191,12 +213,12 @@ World.prototype.draw = function (ctx) {
   ctx.fillText(this.totalCoins, Game.WIDTH - 40 - costMetrics.width, 20);
   ctx.strokeText(this.totalCoins, Game.WIDTH - 40 - costMetrics.width, 20);
   
-  // if (this.index) {
-    // ctx.textAlign = 'left';
-    // ctx.textBaseline = 'top';
-    // ctx.fillText(this.index, 0, 0);
-  // }
-  
+  if (this.fadeTimer > 0) {
+    ctx.globalAlpha = this.fadeTimer / World.FADE_TIME;
+    ctx.fillStyle = this.fadeStyle;
+    ctx.fillRect(0,0,Game.WIDTH,Game.HEIGHT);
+    ctx.globalAlpha = 1;
+  }
 };
 World.prototype.drawMinimap = function (ctx) {
   var scale_map = 160 / this.minimap.width;  
