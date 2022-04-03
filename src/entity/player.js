@@ -19,15 +19,14 @@ function Player(x,y) {
     x:0,
     y:0,
   };
-  this.speed = 0;
   
   this.nearby = [];
 }
 
 Player.DRAW_RADIUS = 0.4;
 Player.MAX_SPEED = 0.007;
-Player.ACCELERATION_START = Player.MAX_SPEED * 0.003;
-Player.ACCELERATION_STOP = Player.MAX_SPEED * 0.01;
+Player.ACCELERATION_START = 0.003;
+Player.ACCELERATION_STOP = 0.01;
 Player.ANGLE_CHANGE = Math.PI * 0.002;
 
 Player.prototype.update = function(elapsed, world) {
@@ -39,50 +38,27 @@ Player.prototype.update = function(elapsed, world) {
   if (this.keys.up) this.targetVelocity.y -= 1;
   if (this.keys.down) this.targetVelocity.y += 1;
   
-  var speedUp = true;
-  if (this.targetVelocity.x === 0 && this.targetVelocity.y === 0) {
-    speedUp = false;
-  } else {
-    var targetAngle = Math.atan2(this.targetVelocity.y, this.targetVelocity.x);
-    var currentAngle = targetAngle;
-    if (this.speed > 0) {
-      currentAngle = Math.atan2(this.velocity.y, this.velocity.x);
-    }
-    var angleDiff = targetAngle - currentAngle;
-    angleDiff += angleDiff > Math.PI ? -2*Math.PI : angleDiff < -Math.PI ? 2*Math.PI : 0;
-    
-    var nextAngle;
-    if (Math.abs(angleDiff) < Player.ANGLE_CHANGE * elapsed) {
-      nextAngle = targetAngle;
-    } else {
-      if (Math.abs(angleDiff) > Math.PI / 2) {
-        speedUp = false;
-      }
-      nextAngle = currentAngle + Math.sign(angleDiff) * Player.ANGLE_CHANGE * elapsed;
-    }
-    
-    this.velocity.x = Math.cos(nextAngle);
-    this.velocity.y = Math.sin(nextAngle);
+  if (this.targetVelocity.x !== 0 && this.targetVelocity.y !== 0) {
+    this.targetVelocity.x /= Math.SQRT2;
+    this.targetVelocity.y /= Math.SQRT2;
   }
   
-  if (speedUp) {
-    var acceleration = Player.ACCELERATION_START * elapsed;
-    if (this.speed + acceleration < Player.MAX_SPEED) {
-      this.speed += acceleration;
-    } else {
-      this.speed = Player.MAX_SPEED;
-    }
+  var vdx = this.targetVelocity.x - this.velocity.x;
+  var vdy = this.targetVelocity.y - this.velocity.y;
+  var vm = Math.sqrt(vdx*vdx+vdy*vdy);
+  var isStopping = vm > Math.SQRT2 || (this.targetVelocity.x === 0 && this.targetVelocity.y === 0);
+  var acceleration = isStopping ? Player.ACCELERATION_STOP : Player.ACCELERATION_START;
+  
+  if (vm < acceleration * elapsed) {
+    this.velocity.x = this.targetVelocity.x;
+    this.velocity.y = this.targetVelocity.y;
   } else {
-    var acceleration = Player.ACCELERATION_STOP * elapsed;
-    if (this.speed - acceleration > 0) {
-      this.speed -= acceleration;
-    } else {
-      this.speed = 0;
-    }
-  }  
-    
+    this.velocity.x += vdx * acceleration / vm * elapsed;
+    this.velocity.y += vdy * acceleration / vm * elapsed;
+  }
+  
   this.predictedBounds.copyFrom(this.bounds);
-  this.predictedBounds.moveBy(this.velocity.x * this.speed * elapsed, this.velocity.y * this.speed * elapsed);
+  this.predictedBounds.moveBy(this.velocity.x * Player.MAX_SPEED * elapsed, this.velocity.y * Player.MAX_SPEED * elapsed);
   var predictedX = this.predictedBounds.left;
   var predictedY = this.predictedBounds.top; 
   var closestX = Math.floor(this.predictedBounds.centerX);
@@ -112,7 +88,8 @@ Player.prototype.update = function(elapsed, world) {
           
           if (collideX) {
             predictedY = this.bounds.top;
-          } else if (collideY) {
+          } 
+          if (collideY) {
             predictedX = this.bounds.left;
           }
           
