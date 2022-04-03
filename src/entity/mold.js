@@ -109,7 +109,7 @@ function Mold(x,y,tickTime) {
   this.active = true;
   this.x = x;
   this.y = y;  
-  this.tickTime = Math.random() * Mold.TICK_PERIOD + tickTime;
+  this.tickTime = (Math.random() + 1) * Mold.TICK_PERIOD + tickTime;
 }
 
 Mold.TICK_PERIOD = 1000;

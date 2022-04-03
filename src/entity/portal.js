@@ -10,7 +10,6 @@ Portal.DRAW_HEIGHT = 2;
 
 Portal.BOB_PERIOD = 3000;
 Portal.BOB_OFFSET = 0.2;
-Portal.BOB_SPEED_FACTOR = 1.5;
 
 Portal.SHADOW_OFFSET = 1.25;
 Portal.SHADOW_BOB_AMOUNT = 0.2;
@@ -37,7 +36,7 @@ Portal.prototype.draw = function(ctx, camera, active) {
   ctx.ellipse(this.drawBounds.centerX, this.drawBounds.centerY, this.drawBounds.width / 2, this.drawBounds.height / 2, 0, 0, 2*Math.PI);
   ctx.fill();
   
-  // Draw character
+  // Draw portal
   var bobOffset = bobPosition * Portal.BOB_OFFSET - Portal.SHADOW_OFFSET;
   
   this.drawBounds.copyFrom(this.bounds);
