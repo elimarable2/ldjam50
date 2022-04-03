@@ -30,7 +30,12 @@ TitleCard.prototype.step = function (elapsed) {
   if (this.transition) {
     this.fadeTime += elapsed;
     if (this.fadeTime > TitleCard.TOTAL_FADE_TIME) {
-      Game.setState(generateLevel(1));
+      if (Game.firstSession) {
+        Game.setState(generateLevel(1));
+      } else {
+        Game.firstSession = true;
+        Game.setState(new Tutorial());
+      }
     }
   } else {
     if (this.fadeTime > elapsed) {
@@ -48,7 +53,6 @@ TitleCard.prototype.step = function (elapsed) {
   while (this.particles.length > 0 && this.particles[0].age > TitleParticle.LIFE) {
     this.particles.shift();
   }
-  console.log(this.particles.length);
   
   this.particleTime += elapsed;
   var spawnArea = Game.WIDTH / 2;
@@ -91,7 +95,7 @@ TitleCard.prototype.draw = function (ctx) {
   this.bctx.globalCompositeOperation = 'destination-in';
   this.bctx.textAlign = 'center';
   this.bctx.textBaseline = 'bottom';
-  this.bctx.font = 'bold '+textSize+'px sans-serif';
+  this.bctx.font = 'bold '+textSize+'px serif';
   this.bctx.fillText("Extinguished", dx, dy, dw);
   
   this.bctx.globalCompositeOperation = 'source-over';
@@ -104,7 +108,7 @@ TitleCard.prototype.draw = function (ctx) {
   
   textSize = Math.min(40, minorAxis / 8);
   dx = Game.WIDTH / 2;
-  dy = Math.max(Game.HEIGHT - 3 * textSize, 4 * Game.HEIGHT / 5) + textSize / 6 * Math.sin(this.animTime / 1000);
+  dy = Math.max(Game.HEIGHT - 3 * textSize, 4 * Game.HEIGHT / 5) + textSize / 6 * Math.sin(this.animTime * Math.PI / 2000);
   dw = 4 * Game.WIDTH / 5;
   
   ctx.textAlign = 'center';
