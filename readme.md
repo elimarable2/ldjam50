@@ -1,6 +1,6 @@
 ## Extinguished
 
-Welcome to Extinguished! This game was created by Eli Marable to submit to [Ludum Dare #50](https://ldjam.com/).
+Welcome to Extinguished! This game was created by Eli Marable to submit to [Ludum Dare #50](https://ldj.am/$287244).
 
 ### Project setup
 
