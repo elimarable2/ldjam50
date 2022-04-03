@@ -173,7 +173,7 @@ var Game = {
 		document.addEventListener('keyup',function (ev) { that.keyup(ev); });
 	
     var init = this.loader.require('*');
-    init.onComplete = function () { that.setState(generateLevel(1)); };
+    init.onComplete = function () { that.setState(new TitleCard()); };
     // init.onComplete = function () { that.setState(MainMenu()); };
     // init.onComplete = function () { that.setState(new Test("CC")); };
     this.setState(init);
