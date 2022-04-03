@@ -321,6 +321,14 @@ window.onresize = function () {
   mainContext.imageSmoothingEnabled = false;
 };
 
+window.onblur = function () {
+  SOUND.mute();
+  MUSIC.mute();
+};
+window.onfocus = function () {
+  SOUND.unmute();
+  MUSIC.unmute();
+};
 
 
 window.onload = function () {
