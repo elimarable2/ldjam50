@@ -25,6 +25,8 @@ function World(spec, cost) {
   this.fadeDirection = -1;
   this.fadeStyle = '#000000';
   
+  this.particles = [];
+  
   this.layout = toColors(spec, function (value) {
     if (value === 0) return 'black';
     return 'white';
@@ -125,6 +127,10 @@ World.prototype.step = function (elapsed) {
         var note = 220 + 660/12 * Math.floor(12 * Math.random());
         
         SOUND.play(Game.audio.coin.get(), {detune: note});
+        for (var p = 0; p < CoinParticle.SPAWN_COUNT; ++p) {
+          this.particles.push(new CoinParticle(this.coins[i].bounds.centerX, this.coins[i].bounds.centerY, p));
+        }
+        
         this.coins[i].active = false;
         ++this.totalCoins;
       }
@@ -187,6 +193,14 @@ World.prototype.audioStep = function (elapsed) {
   }
 };
 World.prototype.animationStep = function (elapsed) {
+  for (var i = 0; i < this.particles.length; ++i) {
+    this.particles[i].update(elapsed, this);
+    if (!this.particles[i].active) {
+      this.particles.splice(i,1);
+      --i;
+    }
+  }
+  
   if (this.fadeDirection < 0) {
     if (this.fadeTimer > elapsed) {
       this.fadeTimer -= elapsed;
@@ -226,6 +240,10 @@ World.prototype.draw = function (ctx) {
       }
       ++coinsLeft;
     }
+  }
+  
+  for (var i = 0; i < this.particles.length; ++i) {
+    this.particles[i].draw(ctx, this.camera);
   }
   
   ctx.lineWidth = 1;

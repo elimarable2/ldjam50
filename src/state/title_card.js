@@ -129,10 +129,12 @@ TitleCard.prototype.draw = function (ctx) {
   }
 };
 TitleCard.prototype.keydown = function (ev) {
-  this.keyPressed = true;
+  if (this.fadeTime <= 1000) {
+    this.keyPressed = true;
+  }
 };
 TitleCard.prototype.keyup = function (ev) {
-  if (this.keyPressed) {
+  if (this.fadeTime <= 1000 && this.keyPressed) {
     this.transition = true;
   }
   this.keyPressed = false;
