@@ -21,10 +21,10 @@ TitleCard.TOTAL_FADE_TIME = 2000;
 TitleCard.PARTICLE_COVERAGE = 0.002;
 
 TitleCard.prototype.onEnter = function () {
-  if (!Game.audio.music.get().isPlaying) {
-    MUSIC.stopAll();
-    MUSIC.play(Game.audio.music.get());
-  }
+  // if (!Game.audio.music.get().isPlaying) {
+    // MUSIC.stopAll();
+    // MUSIC.play(Game.audio.music.get());
+  // }
 };
 TitleCard.prototype.step = function (elapsed) {
   if (this.transition) {

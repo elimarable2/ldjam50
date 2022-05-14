@@ -274,6 +274,9 @@ var Game = {
     if (this.ui.keydown) { this.ui.keydown(ev); }
 	},
 	keyup: function (ev) {
+    if (ev.key === 'F4') {
+      mainCanvas.requestFullscreen();
+    }
     if (this.ui.keyup) { this.ui.keyup(ev); }
 	},
 };
